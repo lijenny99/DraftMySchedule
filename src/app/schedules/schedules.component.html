@@ -1,0 +1,30 @@
+<div class="schedules">
+  <button class="delete" id="delete-schedules" (click)="deleteAll()">Delete all</button>
+  <button class="view" id="get-schedules" (click)="getSchedules()">View all</button>
+  <h3>Schedules</h3>
+  <form>
+    <label>Name:</label>
+    <input [formControl]="schedule" name="schedule" type="text" />
+    <button (click)="createSchedule(schedule.value)" [disabled]="!schedule.valid">Create</button>
+    <button (click)="viewSchedule(schedule.value)" [disabled]="!schedule.valid">View</button>
+    <button (click)="deleteOne(schedule.value)" [disabled]="!schedule.valid">Delete</button>
+    <div *ngIf="schedule.invalid && (schedule.dirty || schedule.touched)">
+      <p *ngIf="schedule.errors.required">
+        Please enter a schedule name.
+      </p>
+    </div>
+  </form>
+  <ul>
+    <div *ngIf="displaySched == 1">
+      <li *ngFor="let s of scheduleTimetable">
+        {{s.subject}} {{s.course}} {{s.courseInfo[0].component}} {{s.courseInfo[0].section}}: {{s.courseInfo[0].days}}
+        {{s.courseInfo[0].start}}-{{s.courseInfo[0].end}} ({{s.courseInfo[0].room}})
+      </li>
+    </div>
+    <div *ngIf="displaySched == 2">
+      <li *ngFor="let schedule of schedules">
+        {{schedule.scheduleName}} ({{schedule.numCourses}} courses)
+      </li>
+    </div>
+  </ul>
+</div>

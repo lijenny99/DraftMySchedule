@@ -1,0 +1,12 @@
+body {
+    margin: 40px;
+    font-family: Arial;
+}
+
+p {
+    color: red;
+}
+
+form, input, label, button {
+    margin-right: 5px
+}

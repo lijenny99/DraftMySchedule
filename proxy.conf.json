@@ -1,0 +1,20 @@
+{
+  "/subjects": {
+    "target": "http://localhost:3000/subjects",
+    "secure": true,
+    "pathRewrite": {
+      "^/subjects": ""
+    },
+    "logLevel": "debug",
+    "changeOrigin": true
+  },
+  "/schedules": {
+    "target": "http://localhost:3000/schedules",
+    "secure": true,
+    "pathRewrite": {
+      "^/schedules": ""
+    },
+    "logLevel": "debug",
+    "changeOrigin": true
+  }
+}
