@@ -36,6 +36,16 @@ var firebaseConfig = {
 
 firebase.initializeApp(firebaseConfig);
 
+firebase.auth().signInWithEmailAndPassword(email, password)
+  .then((user) => {
+    // Signed in 
+    // ...
+  })
+  .catch((error) => {
+    var errorCode = error.code;
+    var errorMessage = error.message;
+  });
+
 // Read timetable JSON file
 var fs = require('fs');
 var timetable;

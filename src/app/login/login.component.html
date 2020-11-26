@@ -1,0 +1,10 @@
+<div class="login">
+    <h3>Sign Up</h3>
+    <form [formGroup]="signUpForm">
+      <label>Email:</label>
+      <input formControlName="email" name="email" type="text" />
+      <label>Password:</label>
+      <input formControlName="password" name="password" type="text" />
+      <button (click)="signUp()" [disabled]="!signUpForm.valid">Sign Up</button>
+    </form>
+  </div>
