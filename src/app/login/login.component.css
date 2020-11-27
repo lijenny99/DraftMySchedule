@@ -1,0 +1,18 @@
+.login {
+    border: 2px solid lavender;
+    border-radius: 5px;
+    background-color: rgba(230, 230, 250, 0.25);
+    padding: 10px 20px 10px 20px;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+a {
+    color: black;
+    text-decoration: underline;
+}
+
+a:hover {
+    color: royalblue;
+    cursor: pointer;
+}

@@ -10,7 +10,7 @@ import { FirebaseService } from '../firebase.service';
 export class LoginComponent implements OnInit {
 
   // Form input
-  signUpForm = new FormGroup({
+  loginForm = new FormGroup({
     email: new FormControl('',[
       Validators.required
     ]),
@@ -19,32 +19,31 @@ export class LoginComponent implements OnInit {
     ]),
   });
 
+  show: boolean = false;
   isSignedIn = false;
 
-  constructor(public firebaseService : FirebaseService){}
+  constructor(public firebaseService : FirebaseService) {}
   ngOnInit(){
-    if(localStorage.getItem('user')!== null)
-      this.isSignedIn = true;
-    else
-      this.isSignedIn = false;
   }
   async signUp(){
-    const e = this.signUpForm.controls.email.value;
-    const pwd = this.signUpForm.controls.password.value;
-    console.log(e,pwd)
+    const e = this.loginForm.controls.email.value;
+    const pwd = this.loginForm.controls.password.value;
     await this.firebaseService.signup(e,pwd)
     if (this.firebaseService.isLoggedIn)
       this.isSignedIn = true;
   }
-  async onSignin(){
-    const e = this.signUpForm.controls.email.value;
-    const pwd = this.signUpForm.controls.password.value;
+  async signIn(){
+    const e = this.loginForm.controls.email.value;
+    const pwd = this.loginForm.controls.password.value;
     await this.firebaseService.signin(e,pwd)
     if (this.firebaseService.isLoggedIn)
       this.isSignedIn = true;
   }
   handleLogout(){
     this.isSignedIn = false;
+  }
 
+  toggleLogin() {
+    this.show = !this.show;
   }
 }

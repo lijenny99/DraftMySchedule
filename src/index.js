@@ -87,7 +87,7 @@ app.get('/keyword/:keyword', [
 })
 
 // Get timetable entry for given subject code and course code
-app.get('/subjects/:subject/:course?', [
+app.get('/subjects/:subject?/:course?', [
     check("subject").trim().escape(),
     check("course").trim().escape(),
 ], (req, res) => {
