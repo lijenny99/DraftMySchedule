@@ -1,13 +1,10 @@
 <div class="subjects">
-  <button class="view" (click)="getSubjects()" id="get-subjects">View all</button>
   <h3>Subjects</h3>
   <form [formGroup]="subjectsForm">
     <label>Subject:</label>
     <input formControlName="subject" name="subject" type="text" />
     <label>Course Code:</label>
     <input formControlName="course" name="course" type="text" />
-    <label>Component:</label>
-    <input formControlName="component" name="component" type="text" />
     <button (click)="search()" [disabled]="!subjectsForm.valid">Search</button>
     <div *ngIf="subjectsForm.invalid && (subjectsForm.dirty || subjectsForm.touched)">
       <p *ngIf="subjectsForm.controls.subject.errors?.required">
@@ -16,21 +13,15 @@
     </div>
   </form>
   <ul>
-    <div *ngIf="displaySub == 1">
-      <li *ngFor="let subject of subjects">
-        {{subject.subject}} - {{subject.description}}
-      </li>
-    </div>
-    <div *ngIf="displaySub == 2">
-      <li *ngFor="let subject of subjectCodes">
-        {{subject.courseCode}}
-      </li>
-    </div>
-    <div *ngIf="displaySub == 3">
-      <li *ngFor="let subject of timetableInfo">
-        {{subject.subject}} {{subject.courseCode}} {{subject.component}} {{subject.section}}: {{subject.days}}
-        {{subject.start}}-{{subject.end}} {{subject.room}}
-      </li>
-    </div>
+    <li *ngFor="let subject of timetableInfo">
+      <span class="bold">{{subject.subject}} {{subject.courseCode}} - {{subject.description}}</span>
+      <button class="details" (click)="viewDetails(subject)">Details</button>
+      <br>
+      {{subject.component}} {{subject.section}}: {{subject.days}}
+      {{subject.start}}-{{subject.end}} {{subject.room}}
+      <div *ngIf="subject.show">
+        <span class="classDetail">{{subject.fullDescription}}</span>
+      </div>
+    </li>
   </ul>
 </div>

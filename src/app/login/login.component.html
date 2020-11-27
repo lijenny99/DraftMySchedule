@@ -7,4 +7,15 @@
       <input formControlName="password" name="password" type="text" />
       <button (click)="signUp()" [disabled]="!signUpForm.valid">Sign Up</button>
     </form>
+    <p>Already have an account? Sign In</p>
+
+    <h3>Sign In</h3>
+    <form [formGroup]="signUpForm">
+      <label>Email:</label>
+      <input formControlName="email" name="email" type="text" />
+      <label>Password:</label>
+      <input formControlName="password" name="password" type="text" />
+      <button (click)="signUp()" [disabled]="!signUpForm.valid">Sign Up</button>
+    </form>
+    <p>Don't have an account? Sign Up</p>
   </div>

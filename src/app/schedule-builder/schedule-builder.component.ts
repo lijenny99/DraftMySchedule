@@ -37,7 +37,7 @@ export class ScheduleBuilderComponent implements OnInit {
     const sb = this.scheduleBuilderForm.controls.sub.value.toUpperCase()
     const cc = this.scheduleBuilderForm.controls.courseCode.value.toUpperCase()
 
-    this.timetableService.getTimetableInfo(sb,cc,'').subscribe( data => {
+    this.timetableService.getTimetableInfo(sb,cc).subscribe( data => {
       this.info = data;
       // If subject+course combo exists
       if (data != undefined) { 

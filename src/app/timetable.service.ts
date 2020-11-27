@@ -14,23 +14,9 @@ export class TimetableService {
     headers: new HttpHeaders({'Content-Type': 'application/json'})
   }
 
-  // Get all available subject codes
-  getSubjects(): Observable<any> {
-    return this.http.get(`/subjects`).pipe(
-      catchError(this.handleError<any>())
-      )
-  }
-
-  // Get all course codes for a given subject code
-  getSubject(sub: string): Observable<any> {
-    return this.http.get(`/subjects/${sub}`).pipe(
-      catchError(this.handleError<any>())
-    )
-  }
-
   // Get timetable entry for given subject code, course code and optional course component
-  getTimetableInfo(sub: string, course: string, component: string): Observable<any> {
-    return this.http.get(`/subjects/${sub}/${course}/${component}`).pipe(
+  getTimetableInfo(sub: string, course: string): Observable<any> {
+    return this.http.get(`/subjects/${sub}/${course}`).pipe(
       catchError(this.handleError<any>())
     )
   }
