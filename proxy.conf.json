@@ -16,5 +16,14 @@
     },
     "logLevel": "debug",
     "changeOrigin": true
+  },
+  "/keyword": {
+    "target": "http://localhost:3000/keyword",
+    "secure": true,
+    "pathRewrite": {
+      "^/keyword": ""
+    },
+    "logLevel": "debug",
+    "changeOrigin": true
   }
 }

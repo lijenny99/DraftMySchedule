@@ -8,21 +8,22 @@ const bodyParser = require('body-parser')
 const jsonParser = bodyParser.json()
 
 // Set up express-validator
-const { check } = require('express-validator');
+const { check, validationResult } = require('express-validator');
 
 // Set up lowdb
 const low = require('lowdb');
 const FileSync = require('lowdb/adapters/FileSync');
 const adapter = new FileSync('db.json');
 const db = low(adapter);
+db.defaults({schedules: []}).write();
+
+// Set up string similarity
+var stringSimilarity = require('string-similarity');
 
 // Set up firebase
 var firebase = require("firebase/app");
 require("firebase/auth");
 
-db.defaults({schedules: []}).write();
-
-// Initialize firebase
 var firebaseConfig = {
     apiKey: "AIzaSyB72rXHZQusPEFcgpxSl6wMLzWTKxpAUqk",
     authDomain: "se3316-lab5-a1775.firebaseapp.com",
@@ -46,19 +47,22 @@ fs.readFile('data.json','utf8',(err,data) => {
 // Set up serving front-end code
 app.use('/',express.static('static'));
 
-
-// Question 3: Get timetable entry for given subject code, course code and optional course component
-app.get('/subjects/:subject/:course?', [
-    check("subject").trim().escape(),
-    check("course").trim().escape(),
+// Keyword search
+app.get('/keyword/:keyword', [
+    check("keyword").trim().escape(),
+    check("keyword").isLength({ min: 5 })
 ], (req, res) => {
     // Store passed parameters as constants
-    const subject = req.params.subject;
-    const course = req.params.course;
+    const keyword = req.params.keyword;
+
+    const errors = validationResult(req)
+    if (!errors.isEmpty()) {
+      return res.status(422).send(`Keyword must be at least 5 characters`)
+    }
 
     // Filter by specified subject and course if it has a value and map timetable attributes to new array
     const data = timetable.filter(e => (
-        e.subject === subject && (course ? e.catalog_nbr == course : true)
+        (e.catalog_nbr.toString().indexOf(keyword) > -1) || (e.className.indexOf(keyword) > -1) || (stringSimilarity.compareTwoStrings(keyword, e.className) > 0.5)
     )).map(e => ({
         subject: e.subject,
         courseCode: e.catalog_nbr,
@@ -76,7 +80,45 @@ app.get('/subjects/:subject/:course?', [
     // Check if subject and course and (optional) component entry exists in timetable file
     if (data!= 0)// Exists
         res.send(data);
-    else {// Does not exist 
+    else {
+        res.status(404).send(`No results found`)
+    }
+        
+})
+
+// Get timetable entry for given subject code and course code
+app.get('/subjects/:subject/:course?', [
+    check("subject").trim().escape(),
+    check("course").trim().escape(),
+], (req, res) => {
+    // Store passed parameters as constants
+    const subject = req.params.subject;
+    const course = req.params.course;
+
+    // Filter by specified subject and course if it has a value and map timetable attributes to new array
+    const data = timetable.filter(e => (
+        e.subject === subject && (course ? (e.catalog_nbr.toString().indexOf(course) > -1) : true)
+    )).map(e => ({
+        subject: e.subject,
+        courseCode: e.catalog_nbr,
+        description: e.className,
+        start: e.course_info[0].start_time,
+        end: e.course_info[0].end_time,
+        days: e.course_info[0].days,
+        section: e.course_info[0].class_section,
+        room: e.course_info[0].facility_ID,
+        component: e.course_info[0].ssr_component,
+        classNum: e.course_info[0].class_nbr,
+        fullDescription: e.catalog_description,
+    }));
+
+    // Check if subject and course and (optional) component entry exists in timetable file
+    if (data!= 0)// Exists
+        res.send(data);
+    else if (course == undefined) {// Does not exist 
+        res.status(404).send(`${subject} does not exist`)
+    }
+    else {
         res.status(404).send(`${subject} ${course} does not exist`)
     }
         

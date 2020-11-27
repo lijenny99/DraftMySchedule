@@ -1,10 +1,12 @@
 <div class="subjects">
-  <h3>Subjects</h3>
+  <h3>Courses</h3>
   <form [formGroup]="subjectsForm">
     <label>Subject:</label>
     <input formControlName="subject" name="subject" type="text" />
     <label>Course Code:</label>
     <input formControlName="course" name="course" type="text" />
+    <label>Keyword:</label>
+    <input formControlName="keyword" name="keyword" type="text" />
     <button (click)="search()" [disabled]="!subjectsForm.valid">Search</button>
     <div *ngIf="subjectsForm.invalid && (subjectsForm.dirty || subjectsForm.touched)">
       <p *ngIf="subjectsForm.controls.subject.errors?.required">

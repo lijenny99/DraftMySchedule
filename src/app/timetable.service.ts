@@ -21,6 +21,12 @@ export class TimetableService {
     )
   }
 
+  getKeywordInfo(key: string): Observable<any> {
+    return this.http.get(`/keyword/${key}`).pipe(
+      catchError(this.handleError<any>())
+    )
+  }
+
   // Create a new schedule
   createSchedule(schedule: string): Observable<any> {
     return this.http.post<any>('/schedules/',{"name": schedule},this.httpOptions).pipe(

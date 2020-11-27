@@ -9,16 +9,13 @@ import { TimetableService } from '../timetable.service';
 })
 export class SubjectsComponent implements OnInit {
   // Global variables
-  public subjects = [];
-  public subjectCodes = [];
   public timetableInfo = [];
 
   // Form input
   subjectsForm = new FormGroup({
-    subject: new FormControl('',[
-      Validators.required
-    ]),
+    subject: new FormControl(''),
     course: new FormControl(''),
+    keyword: new FormControl('')
   });
 
   constructor(private timetableService: TimetableService) { }
@@ -31,8 +28,14 @@ export class SubjectsComponent implements OnInit {
     // Extract input values
     const s = this.subjectsForm.controls.subject.value.toUpperCase()
     const cs = this.subjectsForm.controls.course.value.toUpperCase()
-
-    this.timetableService.getTimetableInfo(s, cs).subscribe(data => this.timetableInfo = data)
+    const key = this.subjectsForm.controls.keyword.value.toUpperCase()
+    
+    if (s) {
+      this.timetableService.getTimetableInfo(s, cs).subscribe(data => this.timetableInfo = data)
+    }
+    else {
+      this.timetableService.getKeywordInfo(key).subscribe(data => this.timetableInfo = data)
+    }
   }
 
   viewDetails(subject) {
