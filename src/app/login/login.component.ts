@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { FirebaseService } from '../firebase.service';
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'app-login',
@@ -22,7 +23,7 @@ export class LoginComponent implements OnInit {
   show: boolean = false;
   isSignedIn = false;
 
-  constructor(public firebaseService : FirebaseService) {}
+  constructor(public firebaseService : FirebaseService, private router: Router) {}
   ngOnInit(){
   }
   async signUp(){
@@ -45,5 +46,11 @@ export class LoginComponent implements OnInit {
 
   toggleLogin() {
     this.show = !this.show;
+  }
+
+  googleLogin() {
+    this.firebaseService.loginWithGoogle().then(res => {
+      this.router.navigate(['/secure'])
+    })
   }
 }

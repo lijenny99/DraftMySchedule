@@ -8,4 +8,5 @@
       <button (click)="show ? signIn() : signUp()" [disabled]="!loginForm.valid">{{show ? 'Sign In' : 'Sign Up'}}</button>
     </form>
     <p>{{show ? 'Do not have an account? ' : 'Already have an account? '}}<a (click)="toggleLogin()">{{show ? 'Sign Up' : 'Sign In'}}</a></p>
+    <button (click)="googleLogin()">{{show ? 'Sign In' : 'Sign Up'}} with Google</button>
   </div>  

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import {AngularFireAuth} from '@angular/fire/auth'
 import { Observable, of } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import * as firebase from 'firebase/app'
 
 @Injectable({
   providedIn: 'root'
@@ -9,7 +9,7 @@ import { catchError } from 'rxjs/operators';
 export class FirebaseService {
 
   isLoggedIn = false
-  constructor(public firebaseAuth : AngularFireAuth) { }
+  constructor(public firebaseAuth : AngularFireAuth, public afAuth: AngularFireAuth) { }
   async signin(email: string, password : string){
     await this.firebaseAuth.signInWithEmailAndPassword(email,password)
     .then(res=>{
@@ -26,6 +26,16 @@ export class FirebaseService {
       alert('Account created')
     }, err => alert(err.message))
   }
+
+  async loginWithGoogle(){
+    const provider = new firebase.default.auth.GoogleAuthProvider();
+    provider.addScope('profile');
+    provider.addScope('email');
+    await this.afAuth.signInWithPopup(provider).then(res => {
+      console.log(res);
+    }, err => alert(err))
+}
+
   logout(){
     this.firebaseAuth.signOut()
     localStorage.removeItem('user')

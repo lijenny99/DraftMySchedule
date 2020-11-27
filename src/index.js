@@ -20,22 +20,6 @@ db.defaults({schedules: []}).write();
 // Set up string similarity
 var stringSimilarity = require('string-similarity');
 
-// Set up firebase
-var firebase = require("firebase/app");
-require("firebase/auth");
-
-var firebaseConfig = {
-    apiKey: "AIzaSyB72rXHZQusPEFcgpxSl6wMLzWTKxpAUqk",
-    authDomain: "se3316-lab5-a1775.firebaseapp.com",
-    databaseURL: "https://se3316-lab5-a1775.firebaseio.com",
-    projectId: "se3316-lab5-a1775",
-    storageBucket: "se3316-lab5-a1775.appspot.com",
-    messagingSenderId: "386528497172",
-    appId: "1:386528497172:web:49eac83ef0f13aa2e42101"
-};
-
-firebase.initializeApp(firebaseConfig);
-
 // Read timetable JSON file
 var fs = require('fs');
 var timetable;

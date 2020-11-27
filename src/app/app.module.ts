@@ -37,6 +37,7 @@ const config = {
     RouterModule.forRoot([
       {path: 'login', component: LoginComponent},
       {path: 'search', component: SubjectsComponent},
+      {path: 'secure', component: SchedulesComponent},
     ]),
     FormsModule,
     ReactiveFormsModule,
