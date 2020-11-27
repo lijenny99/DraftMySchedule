@@ -14,8 +14,23 @@ const { check, validationResult } = require('express-validator');
 const low = require('lowdb');
 const FileSync = require('lowdb/adapters/FileSync');
 const adapter = new FileSync('db.json');
-const db = low(adapter);
-db.defaults({schedules: []}).write();
+// const db = low(adapter);
+// db.defaults({schedules: []}).write();
+
+// Set up mongodb
+const mongoose = require('mongoose');
+mongoose.connect('mongodb+srv://jenny:jennifer123@lab5.4agzt.mongodb.net/database?retryWrites=true&w=majority', {useNewUrlParser: true, useUnifiedTopology: true}, (req, res) => {
+    console.log("working")
+})
+mongoose.set('useFindAndModify', false);
+const mdb = mongoose.connection
+
+// mdb.on('error', (error) => console.log(error))
+// mdb.once('open', () => console.log('Connnected to database'))
+
+Schedule = require('./app/model.js')
+
+// db.runCommand({"convertToCapped": "mycoll", size: 20});
 
 // Set up string similarity
 var stringSimilarity = require('string-similarity');
@@ -108,8 +123,63 @@ app.get('/subjects/:subject?/:course?', [
         
 })
 
+app.get('/sched',async(req,res) => {
+    try {
+        const schedules = await Schedule.find()
+        res.send(schedules)
+    } catch (err) {
+        res.status(500).send(err.message)
+    }
+})
+
+app.post('/schedules', jsonParser, async(req,res) => {
+    const name = req.body.name
+    const email = req.body.email
+
+    const schedule = new Schedule({
+        scheduleName: name,
+        email: email
+    })
+    const filter = await Schedule.find({email: email, scheduleName: name})
+
+    if (filter!=0) { // Exists 
+        res.status(404).send(`A schedule with the name ${name} already exists!`)
+    }
+    else { // Does not exist
+        const max = await Schedule.find({email: email})
+        if (max.length >= 3) {
+            res.status(404).send(`You can have reached your maximum of 20 schedules`)
+        }
+        else {
+            await schedule.save()
+            const data = await Schedule.find({scheduleName: name})
+            res.status(200).send(data);
+        }
+    }   
+
+})
+
+app.delete('/schedules/:name/:email', [
+    check("nameToDelete").trim().escape(),
+], async (req,res) => {
+    // Store passed parameter as constant
+    const nameToDelete = req.params.name;
+    const email = req.params.email;
+
+    // Filter by specified schedule name 
+    const filter = await Schedule.find({email: email, scheduleName: nameToDelete});
+    console.log(filter)
+    if (filter != 0) { // Exists
+        Schedule.findOneAndRemove({email: email, scheduleName: nameToDelete}).exec(() => {
+            res.send({message: `"${nameToDelete}" has been deleted`})
+    })}
+    else { // Does not exist
+        res.status(404).send(`There is no schedule with the name ${nameToDelete}`)
+    }
+})
+
 // Question 4: Create a new schedule
-app.post('/schedules', jsonParser, [
+app.post('/sched', jsonParser, [
     check("name").trim().escape()
 ], (req,res) => {
     // Store passed parameter as constant
@@ -185,7 +255,7 @@ app.get('/schedules/:name', [
 })
 
 // Question 7: Delete a schedule with a given name
-app.delete('/schedules/:name', [
+app.delete('/sched/:name', [
     check("nameToDelete").trim().escape(),
 ], (req,res) => {
     // Store passed parameter as constant

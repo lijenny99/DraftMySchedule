@@ -16,3 +16,22 @@ a:hover {
     color: royalblue;
     cursor: pointer;
 }
+
+.loginBtn {
+    background-color: white;
+    border: grey solid 1px;
+    color: black;
+    font-weight: bold;
+    padding: 10px 24px;
+    border-radius: 5px;
+    text-align: center;
+    font-size: 14px;
+    margin: 4px 2px 20px 2px;
+    cursor: pointer;
+}
+
+img {
+    width: 15px;
+    height: auto;
+    margin-left: 2px;
+}
