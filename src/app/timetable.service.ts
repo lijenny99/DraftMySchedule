@@ -27,6 +27,12 @@ export class TimetableService {
     )
   }
 
+  getCourseLists(): Observable<any> {
+    return this.http.get(`/schedules`).pipe(
+      catchError(this.handleError<any>())
+    )
+  }
+
   // Create a new schedule
   createSchedule(schedule: string): Observable<any> {
     return this.http.post<any>('/schedules/',{"name": schedule},this.httpOptions).pipe(

@@ -33,6 +33,9 @@ export class SubjectsComponent implements OnInit {
     if (s) {
       this.timetableService.getTimetableInfo(s, cs).subscribe(data => this.timetableInfo = data)
     }
+    else if (cs && !s) {
+      this.timetableService.getTimetableInfo(cs, '').subscribe(data => this.timetableInfo = data)
+    }
     else {
       this.timetableService.getKeywordInfo(key).subscribe(data => this.timetableInfo = data)
     }

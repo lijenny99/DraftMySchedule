@@ -20,7 +20,7 @@ const adapter = new FileSync('db.json');
 // Set up mongodb
 const mongoose = require('mongoose');
 mongoose.connect('mongodb+srv://jenny:jennifer123@lab5.4agzt.mongodb.net/database?retryWrites=true&w=majority', {useNewUrlParser: true, useUnifiedTopology: true}, (req, res) => {
-    console.log("working")
+    console.log("Mongoose is running")
 })
 mongoose.set('useFindAndModify', false);
 const mdb = mongoose.connection
@@ -96,7 +96,7 @@ app.get('/subjects/:subject?/:course?', [
 
     // Filter by specified subject and course if it has a value and map timetable attributes to new array
     const data = timetable.filter(e => (
-        e.subject === subject && (course ? (e.catalog_nbr.toString().indexOf(course) > -1) : true)
+        (e.subject === subject || e.catalog_nbr == subject) && (course ? (e.catalog_nbr.toString().indexOf(course) > -1) : true)
     )).map(e => ({
         subject: e.subject,
         courseCode: e.catalog_nbr,
@@ -123,7 +123,7 @@ app.get('/subjects/:subject?/:course?', [
         
 })
 
-app.get('/sched',async(req,res) => {
+app.get('/schedules',async(req,res) => {
     try {
         const schedules = await Schedule.find()
         res.send(schedules)
@@ -132,31 +132,27 @@ app.get('/sched',async(req,res) => {
     }
 })
 
+
 app.post('/schedules', jsonParser, async(req,res) => {
-    const name = req.body.name
     const email = req.body.email
+    const sName = req.body.scheduleName
 
-    const schedule = new Schedule({
-        scheduleName: name,
-        email: email
-    })
-    const filter = await Schedule.find({email: email, scheduleName: name})
-
-    if (filter!=0) { // Exists 
-        res.status(404).send(`A schedule with the name ${name} already exists!`)
+    const filterBySchedule = await Schedule.find({email: email, 'schedules.scheduleName': sName})
+    console.log(filterBySchedule)
+    if (filterBySchedule!=0) {
+        res.status(404).send(`A schedule with the name ${sName} already exists!`)
     }
-    else { // Does not exist
+    else {
         const max = await Schedule.find({email: email})
-        if (max.length >= 3) {
+        if (`${max[0].schedules.length}` >= 3) {
             res.status(404).send(`You can have reached your maximum of 20 schedules`)
         }
         else {
-            await schedule.save()
-            const data = await Schedule.find({scheduleName: name})
+            await Schedule.updateOne({email: email},{$push: {schedules: {scheduleName: sName}}})
+            const data = await Schedule.find({})
             res.status(200).send(data);
-        }
-    }   
-
+         }
+    }
 })
 
 app.delete('/schedules/:name/:email', [

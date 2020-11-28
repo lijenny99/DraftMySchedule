@@ -12,6 +12,7 @@ import { ScheduleBuilderComponent } from './schedule-builder/schedule-builder.co
 import { CommonModule } from '@angular/common';
 import { LoginComponent } from './login/login.component';
 import { FirebaseService } from './firebase.service';
+import { PublicCourseListComponent } from './public-course-list/public-course-list.component';
 
 const config = {
   apiKey: "AIzaSyB72rXHZQusPEFcgpxSl6wMLzWTKxpAUqk",
@@ -29,13 +30,15 @@ const config = {
     SubjectsComponent,
     SchedulesComponent,
     ScheduleBuilderComponent,
-    LoginComponent
+    LoginComponent,
+    PublicCourseListComponent
   ],
   imports: [
     BrowserModule,
     AngularFireModule.initializeApp(config),
     RouterModule.forRoot([
       {path: 'login', component: LoginComponent},
+      {path: 'courselist_public', component: PublicCourseListComponent},
       {path: 'search', component: SubjectsComponent},
       {path: 'secure', component: SchedulesComponent},
     ]),

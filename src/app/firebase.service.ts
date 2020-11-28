@@ -3,11 +3,12 @@ import {AngularFireAuth} from '@angular/fire/auth'
 import { Observable, of } from 'rxjs';
 import * as firebase from 'firebase/app'
 
+
+
 @Injectable({
   providedIn: 'root'
 })
 export class FirebaseService {
-
   isLoggedIn = false
   constructor(public firebaseAuth : AngularFireAuth, public afAuth: AngularFireAuth) { }
   async signin(email: string, password : string){
