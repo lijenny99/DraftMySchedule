@@ -33,6 +33,13 @@ export class TimetableService {
     )
   }
 
+  register(user: string, email: string): Observable<any>  {
+    console.log('ok')
+    return this.http.post<any>('/register',{"user": user, "email": email}).pipe(
+      catchError(this.handleError<any>())
+    )
+  }
+
   // Create a new schedule
   createSchedule(schedule: string, description: string, visibility: boolean): Observable<any> {
     return this.http.post<any>('/schedules/',{"scheduleName": schedule, "description": description, "visibility": visibility, "email": "leslie@gmail.com"},this.httpOptions).pipe(

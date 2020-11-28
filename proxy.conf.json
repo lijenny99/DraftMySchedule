@@ -25,5 +25,14 @@
     },
     "logLevel": "debug",
     "changeOrigin": true
+  },
+  "/register": {
+    "target": "http://localhost:3000/register",
+    "secure": true,
+    "pathRewrite": {
+      "^/register": ""
+    },
+    "logLevel": "debug",
+    "changeOrigin": true
   }
 }

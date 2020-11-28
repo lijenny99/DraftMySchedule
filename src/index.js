@@ -123,6 +123,19 @@ app.get('/subjects/:subject?/:course?', [
         
 })
 
+app.post('/register', jsonParser, async(req,res) => {
+    console.log('hello????')
+    const entry = new Schedule({
+        user: req.body.user,
+        email: req.body.email
+    })
+    try {
+        const newUser = await entry.save();
+        console.log('also works')
+        res.send(newUser)
+    } catch (err) {res.status(404).send(err)}
+})
+
 app.get('/schedules',async(req,res) => {
     try {
         const schedules = await Schedule.find()

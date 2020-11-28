@@ -49,7 +49,6 @@
             {{i.subject}} {{i.course}} {{i.courseInfo[0].component}} {{i.courseInfo[0].section}}: {{i.courseInfo[0].days}} {{i.courseInfo[0].start}}-{{i.courseInfo[0].end}} ({{i.courseInfo[0].room}})
             <button class="delete" (click)="deleteCourse(i,i.courseInfo[0].classNum)">x</button>
           </li>
-          <button (click)="log()">boop</button>
     </ul>
   </div>
 </div>
@@ -59,6 +58,26 @@
   <ul>
     <li *ngFor="let schedule of schedules">
       {{schedule.sName}} ({{schedule.num}} courses)
+      <button class="details" (click)="edit()">Edit</button>
     </li>
   </ul>
+  <div *ngIf="show" class="edit-schedule">
+    <form [formGroup]="scheduleForm">
+      <label>Name:</label>
+      <br>
+      <input formControlName="schedule" name="schedule" type="text" class="input-edit"/>
+      <br>
+      <label>Description (optional):</label>
+      <input formControlName="description" name="description" type="text" class="input-edit"/>
+      <br>
+      <label>Public?</label>
+      <input formControlName="visibility" name="visibility" type="checkbox">
+      <button class="create" (click)="createSchedule()" [disabled]="!scheduleForm.valid">Create</button>
+      <div *ngIf="scheduleForm.invalid && (scheduleForm.dirty || scheduleForm.touched)">
+        <p *ngIf="scheduleForm.controls.schedule.errors?.required">
+          Please enter a schedule name.
+        </p>
+      </div>
+    </form>
+  </div>
 </div>

@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { FirebaseService } from '../firebase.service';
+import { TimetableService } from '../timetable.service';
 import {Router} from '@angular/router';
 
 @Component({
@@ -12,6 +13,7 @@ export class LoginComponent implements OnInit {
 
   // Form input
   loginForm = new FormGroup({
+    name: new FormControl(''),
     email: new FormControl('',[
       Validators.required
     ]),
@@ -23,13 +25,16 @@ export class LoginComponent implements OnInit {
   show: boolean = false;
   isSignedIn = false;
 
-  constructor(public firebaseService : FirebaseService, private router: Router) {}
+  constructor(public firebaseService : FirebaseService, public timetableService: TimetableService, private router: Router) {}
   ngOnInit(){
   }
   async signUp(){
+    const n = this.loginForm.controls.name.value;
     const e = this.loginForm.controls.email.value;
     const pwd = this.loginForm.controls.password.value;
-    await this.firebaseService.signup(e,pwd)
+    await this.firebaseService.signup(e,pwd).then (res => {
+      this.timetableService.register(n,e).subscribe();
+    })
     if (this.firebaseService.isLoggedIn)
       this.isSignedIn = true;
   }

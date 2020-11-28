@@ -15,6 +15,7 @@ export class SchedulesComponent implements OnInit {
   public info = [];
   public x = [];
   public exist = [];
+  public show: boolean;
 
   // Form input
   scheduleForm = new FormGroup({
@@ -50,7 +51,6 @@ export class SchedulesComponent implements OnInit {
       })
     });
   }
-  
 
   // Create a new schedule
   createSchedule() {
@@ -63,10 +63,6 @@ export class SchedulesComponent implements OnInit {
       // alert(`A schedule with the name "${data[0].scheduleName}" was created`);
       // window.location.reload();
     })
-  }
-
-  log() {
-    console.log(this.schedules)
   }
 
   // // Get the list of subject code, course code pairs for a given schedule
@@ -134,5 +130,9 @@ export class SchedulesComponent implements OnInit {
       alert(`Schedule ${data.scheduleName} has been built`)
       window.location.reload()
     })
+  }
+
+  edit() {
+    this.show = !this.show
   }
 }
