@@ -181,6 +181,29 @@ app.delete('/schedules/:name/:email', [
     }
 })
 
+app.put('/schedules/:name/:email', jsonParser, [
+    check("name").trim().escape(),
+    check("courses").trim().escape(),
+], async (req,res) => {
+    // Store passed parameters as constants
+    const sName = req.params.name;
+    const courses = req.body.courseList;
+    const email = req.params.email
+
+    // Filter by specified schedule name 
+    const checkName = await Schedule.find({email: email, 'schedules.scheduleName': sName});
+    console.log(checkName)
+    if (checkName != 0) { // Schedule exists
+        await Schedule.updateOne({email: email, 'schedules.scheduleName': sName},{schedules: {courses: courses, lastModified: new Date()}})
+
+        await Schedule.updateOne({email: email, 'schedules.scheduleName': sName}, {schedules: {numCourses: `${checkName[0].schedules.length}`}})
+        res.send(checkName)
+    }
+    else { // Schedule does not exist
+        res.status(404).send(`Schedule with name ${same} was not found!`);
+    }
+})
+
 // Question 4: Create a new schedule
 app.post('/sched', jsonParser, [
     check("name").trim().escape()
@@ -214,7 +237,7 @@ app.post('/sched', jsonParser, [
 })
 
 // Question 5: Save a list of subject code, course code pairs under a given schedule name
-app.put('/schedules/:name', jsonParser, [
+app.put('/sched/:name', jsonParser, [
     check("name").trim().escape(),
     check("courses").trim().escape(),
 ], (req,res) => {
@@ -277,7 +300,7 @@ app.delete('/sched/:name', [
 })
 
 // Question 8: Get a list of schedule names and the number of courses that are saved in each schedule
-app.get('/schedules', (req,res) => {
+app.get('/sched', (req,res) => {
     // Map schedule name and number of courses attributes to new array
     const data = db.get("schedules").map(e => (
         {scheduleName: e.scheduleName, numCourses: e.numCourses}

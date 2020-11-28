@@ -1,12 +1,17 @@
+<p class="about">Welcome to Western's timetable application. This website allows you to view and search courses you are interested in taking, and save them to your own personalized schedule. Feel free to browse the course offerings for the 2020-2021 school year; however, to save schedules, you must create an account.</p>
 <div class="login">
-    <h3>{{show ? 'Sign In' : 'Sign Up'}}</h3>
+    <h3>{{show ? 'Sign Up' : 'Sign In'}}</h3>
     <form [formGroup]="loginForm">
+      <span *ngIf="show">
+        <label>Name:</label>
+        <input formControlName="name" name="name" type="text" />
+      </span>
       <label>Email:</label>
       <input formControlName="email" name="email" type="text" />
       <label>Password:</label>
       <input formControlName="password" name="password" type="password" />
-      <button (click)="show ? signIn() : signUp()" [disabled]="!loginForm.valid">{{show ? 'Sign In' : 'Sign Up'}}</button>
+      <button (click)="show ? signUp() : signIn()" [disabled]="!loginForm.valid">{{show ? 'Sign Up' : 'Sign In'}}</button>
     </form>
-    <p>{{show ? 'Do not have an account? ' : 'Already have an account? '}}<a (click)="toggleLogin()">{{show ? 'Sign Up' : 'Sign In'}}</a></p>
-    <button (click)="googleLogin()" class="loginBtn">{{show ? 'Sign In' : 'Sign Up'}} with   <img src="../assets/google.png"></button>
+    <p>{{show ? 'Already have an account? ' : 'Do not have an account? '}}<a (click)="toggleLogin()">{{show ? 'Sign In' : 'Sign Up'}}</a></p>
+    <button (click)="googleLogin()" class="loginBtn">{{show ? 'Sign Up' : 'Sign In'}} with   <img src="../assets/google.png"></button>
   </div>  

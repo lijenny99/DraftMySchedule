@@ -34,15 +34,15 @@ export class TimetableService {
   }
 
   // Create a new schedule
-  createSchedule(schedule: string): Observable<any> {
-    return this.http.post<any>('/schedules/',{"name": schedule},this.httpOptions).pipe(
+  createSchedule(schedule: string, description: string, visibility: boolean): Observable<any> {
+    return this.http.post<any>('/schedules/',{"scheduleName": schedule, "description": description, "visibility": visibility, "email": "leslie@gmail.com"},this.httpOptions).pipe(
       catchError(this.handleError<any>())
     );
   }
 
   // Save a list of subject code, course code pairs under a given schedule name
   saveSchedule(schedule: string, x: Array<{}>): Observable<any> {
-    return this.http.put(`/schedules/${schedule}`,{"courseList": x},this.httpOptions).pipe(
+    return this.http.put(`/schedules/${schedule}/leslie@gmail.com`,{"courseList": x},this.httpOptions).pipe(
       catchError(this.handleError<any>())
     );
   }

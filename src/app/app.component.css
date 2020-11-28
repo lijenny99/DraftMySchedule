@@ -1,13 +1,10 @@
-
-.about {
-    color: black;
-    font-style: italic;
+h1 {
+    margin-bottom: 30px;
 }
 
 nav {
-    margin-bottom: 30px;
     overflow: hidden;
-    float: right
+    float: right;
 }
 
 nav a {

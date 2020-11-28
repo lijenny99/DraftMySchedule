@@ -1,30 +1,64 @@
-<div class="schedules">
-  <button class="delete" id="delete-schedules" (click)="deleteAll()">Delete all</button>
-  <button class="view" id="get-schedules" (click)="getSchedules()">View all</button>
-  <h3>Schedules</h3>
-  <form>
-    <label>Name:</label>
-    <input [formControl]="schedule" name="schedule" type="text" />
-    <button (click)="createSchedule(schedule.value)" [disabled]="!schedule.valid">Create</button>
-    <button (click)="viewSchedule(schedule.value)" [disabled]="!schedule.valid">View</button>
-    <button (click)="deleteOne(schedule.value)" [disabled]="!schedule.valid">Delete</button>
-    <div *ngIf="schedule.invalid && (schedule.dirty || schedule.touched)">
-      <p *ngIf="schedule.errors.required">
-        Please enter a schedule name.
-      </p>
-    </div>
-  </form>
+<div class="left">
+  <div class="schedules">
+    <!-- <button class="delete-all" id="delete-schedules" (click)="deleteAll()">Delete all</button>
+    <button class="view" id="get-schedules" (click)="getSchedules()">View all</button> -->
+    <h3>Create a Schedule</h3>
+    <form [formGroup]="scheduleForm">
+      <label>Name:</label>
+      <input formControlName="schedule" name="schedule" type="text" />
+  
+      <!-- <button (click)="viewSchedule(schedule.value)" [disabled]="!schedule.valid">View</button>
+      <button (click)="deleteOne(schedule.value)" [disabled]="!schedule.valid">Delete</button> -->
+      <label>Description (optional):</label>
+      <input formControlName="description" name="description" type="text" />
+      <label>Public?</label>
+      <input formControlName="visibility" name="visibility" type="checkbox" />
+      <button (click)="createSchedule()" [disabled]="!scheduleForm.valid">Create</button>
+      <div *ngIf="scheduleForm.invalid && (scheduleForm.dirty || scheduleForm.touched)">
+        <p *ngIf="scheduleForm.controls.schedule.errors?.required">
+          Please enter a schedule name.
+        </p>
+      </div>
+    </form>
+    <ul>
+          <!-- <li *ngFor="let s of scheduleTimetable">
+            {{s.subject}} {{s.course}} {{s.courseInfo[0].component}} {{s.courseInfo[0].section}}: {{s.courseInfo[0].days}}
+            {{s.courseInfo[0].start}}-{{s.courseInfo[0].end}} ({{s.courseInfo[0].room}})
+          </li> -->
+    </ul>
+  </div>
+  <div class="schedule-builder">
+    <button class="save" [class.disabled]="x.length == 0" [disabled]="x.length == 0" (click)="saveSchedule()">Save</button>
+    <h3>Schedule Builder</h3>
+    <form [formGroup]="scheduleBuilderForm">
+        <label>Name:</label>
+        <input formControlName="schedule" name="schedule" type="text" />
+        <label>Subject:</label>
+        <input formControlName="sub" name="sub" type="text" />
+        <label>Course Code:</label>
+        <input formControlName="courseCode" name="courseCode" type="text" />
+        <button (click)="addCourse()" [disabled]="!scheduleBuilderForm.valid">Add Course</button>
+        <div *ngIf="scheduleBuilderForm.invalid && (scheduleBuilderForm.dirty || scheduleBuilderForm.touched)">
+            <p *ngIf="scheduleBuilderForm.controls.schedule.errors?.required || scheduleBuilderForm.controls.sub.errors?.required || scheduleBuilderForm.controls.courseCode.errors?.required">
+              Please fill in all fields.
+            </p>
+          </div>
+    </form>
+    <ul id="builder-output">
+        <li *ngFor="let i of x">
+            {{i.subject}} {{i.course}} {{i.courseInfo[0].component}} {{i.courseInfo[0].section}}: {{i.courseInfo[0].days}} {{i.courseInfo[0].start}}-{{i.courseInfo[0].end}} ({{i.courseInfo[0].room}})
+            <button class="delete" (click)="deleteCourse(i,i.courseInfo[0].classNum)">x</button>
+          </li>
+          <button (click)="log()">boop</button>
+    </ul>
+  </div>
+</div>
+
+<div class="schedule-list">
+  <h3>My Schedules</h3>
   <ul>
-    <div *ngIf="displaySched == 1">
-      <li *ngFor="let s of scheduleTimetable">
-        {{s.subject}} {{s.course}} {{s.courseInfo[0].component}} {{s.courseInfo[0].section}}: {{s.courseInfo[0].days}}
-        {{s.courseInfo[0].start}}-{{s.courseInfo[0].end}} ({{s.courseInfo[0].room}})
-      </li>
-    </div>
-    <div *ngIf="displaySched == 2">
-      <li *ngFor="let schedule of schedules">
-        {{schedule.scheduleName}} ({{schedule.numCourses}} courses)
-      </li>
-    </div>
+    <li *ngFor="let schedule of schedules">
+      {{schedule.sName}} ({{schedule.num}} courses)
+    </li>
   </ul>
 </div>

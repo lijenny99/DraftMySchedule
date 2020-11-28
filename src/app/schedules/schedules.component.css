@@ -20,7 +20,7 @@
     float: right;
   }
 
-.delete {
+.delete-all {
     background-color: #e94545;
     border: none;
     color: white;
@@ -34,3 +34,55 @@
     float: right;
 }
 
+.schedule-builder {
+    border: 2px solid lightslategray;
+    border-radius: 5px;
+    background-color: rgba(119, 136, 153, 0.25);
+    padding: 10px 20px 10px 20px;
+    margin-bottom: 30px;
+}
+
+.save {
+    background-color: #058cb9;
+    border: none;
+    color: white;
+    font-weight: bold;
+    padding: 10px 24px;
+    border-radius: 5px;
+    text-align: center;
+    font-size: 14px;
+    margin: 4px 2px;
+    cursor: pointer;
+    float: right;
+}
+
+.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+button.delete {
+    margin-left: 5px;
+    background-color: gray;
+    border: none;
+    border-radius: 1px;
+    color: white;
+  }
+
+  .schedule-list {
+    border: 2px solid darkseagreen;
+    border-radius: 5px;
+    background-color: rgba(143, 188, 143, 0.25);
+    padding: 10px 20px 10px 20px;
+    margin-bottom: 30px;
+    position: relative;
+    float: right;
+    width: 25%;
+  }
+
+  .left {
+      position: relative;
+      display: inline-block;
+      width: 70%;
+      clear: both;
+  }
