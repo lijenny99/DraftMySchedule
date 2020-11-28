@@ -5,7 +5,7 @@ const scheduleSchema = new mongoose.Schema({
     schedules: [
         {
             scheduleName: {type: String, required: true},
-            description: {type: String},
+            description: {type: String, default: ''},
             visibility: {type: String, default: 'private'},
             courses: [
                 {
@@ -18,9 +18,9 @@ const scheduleSchema = new mongoose.Schema({
                 }
             ],
             numCourses: {type: Number, default: 0},
+            lastModified: {type: Date}
         }
-    ], 
-    lastModified: {type: Number}
+    ]
 })
 
 module.exports = mongoose.model('Schedule', scheduleSchema)

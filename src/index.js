@@ -136,22 +136,29 @@ app.get('/schedules',async(req,res) => {
 app.post('/schedules', jsonParser, async(req,res) => {
     const email = req.body.email
     const sName = req.body.scheduleName
+    const v = req.body.visibility
+    const desc = req.body.description
 
-    const filterBySchedule = await Schedule.find({email: email, 'schedules.scheduleName': sName})
-    console.log(filterBySchedule)
-    if (filterBySchedule!=0) {
-        res.status(404).send(`A schedule with the name ${sName} already exists!`)
-    }
-    else {
-        const max = await Schedule.find({email: email})
-        if (`${max[0].schedules.length}` >= 3) {
-            res.status(404).send(`You can have reached your maximum of 20 schedules`)
+    const filter = await Schedule.find({email: email})
+    if (filter!=0) {
+        const filterBySchedule = await Schedule.find({email: email, 'schedules.scheduleName': sName})
+        if (filterBySchedule!=0) {
+            res.status(404).send(`A schedule with the name ${sName} already exists!`)
         }
         else {
-            await Schedule.updateOne({email: email},{$push: {schedules: {scheduleName: sName}}})
-            const data = await Schedule.find({})
-            res.status(200).send(data);
-         }
+            const max = await Schedule.find({email: email})
+            if (`${max[0].schedules.length}` >= 20) {
+                res.status(404).send(`You can have reached your maximum of 20 schedules`)
+            }
+            else {
+                await Schedule.updateOne({email: email},{$push: {schedules: {scheduleName: sName, visibility: v, description: desc, lastModified: new Date()}}})
+                const data = await Schedule.find({})
+                res.status(200).send(data);
+             }
+        }
+    }
+    else {
+        res.status(404).send(`Permission denied`)
     }
 })
 
@@ -163,10 +170,10 @@ app.delete('/schedules/:name/:email', [
     const email = req.params.email;
 
     // Filter by specified schedule name 
-    const filter = await Schedule.find({email: email, scheduleName: nameToDelete});
-    console.log(filter)
+    const filter = await Schedule.find({email: email, 'schedules.scheduleName': nameToDelete});
+
     if (filter != 0) { // Exists
-        Schedule.findOneAndRemove({email: email, scheduleName: nameToDelete}).exec(() => {
+        Schedule.updateOne({email: email}, {$pull: {schedules: {scheduleName: nameToDelete}}}).exec(() => {
             res.send({message: `"${nameToDelete}" has been deleted`})
     })}
     else { // Does not exist

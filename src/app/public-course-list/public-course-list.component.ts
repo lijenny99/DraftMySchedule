@@ -11,7 +11,26 @@ export class PublicCourseListComponent implements OnInit {
   constructor(private timetableService: TimetableService) { }
 
   ngOnInit(): void {
-    this.timetableService.getCourseLists().subscribe(data => this.courseLists = data)
+    this.timetableService.getCourseLists().subscribe(data => {
+      data.forEach(e => {
+        e.schedules.forEach(el => {
+          if (el.visibility == "public") {
+            this.courseLists.push({
+              user: e.user,
+              lastModified: el.lastModified,
+              sName: el.scheduleName,
+              num: el.numCourses,
+              desc: el.description
+            })
+          }
+        })
+      })
+      this.courseLists.sort((a,b) => new Date(b.lastModified).getTime() - new Date(a.lastModified).getTime())
+    })
+  }
+
+  viewDetails(x) {
+    x.show = !x.show;
   }
 
 }
