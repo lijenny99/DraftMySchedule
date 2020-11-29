@@ -124,14 +124,12 @@ app.get('/subjects/:subject?/:course?', [
 })
 
 app.post('/register', jsonParser, async(req,res) => {
-    console.log('hello????')
     const entry = new Schedule({
         user: req.body.user,
         email: req.body.email
     })
     try {
         const newUser = await entry.save();
-        console.log('also works')
         res.send(newUser)
     } catch (err) {res.status(404).send(err)}
 })
@@ -207,9 +205,7 @@ app.put('/schedules/:name/:email', jsonParser, [
     const checkName = await Schedule.find({email: email, 'schedules.scheduleName': sName});
     console.log(checkName)
     if (checkName != 0) { // Schedule exists
-        await Schedule.updateOne({email: email, 'schedules.scheduleName': sName},{schedules: {courses: courses, lastModified: new Date()}})
-
-        await Schedule.updateOne({email: email, 'schedules.scheduleName': sName}, {schedules: {numCourses: `${checkName[0].schedules.length}`}})
+        await Schedule.updateOne({email: email, schedules: {$elemMatch: {scheduleName: sName}}},{$set: {"schedules.$.courses": courses, "schedules.$.lastModified": Date(), "schedules.$.numCourses": courses.length}})
         res.send(checkName)
     }
     else { // Schedule does not exist

@@ -59,7 +59,7 @@ export class SchedulesComponent implements OnInit {
     const vis = this.scheduleForm.controls.visibility.value
     console.log(vis)
     this.timetableService.createSchedule(sched,desc,vis).subscribe(data => {
-      console.log(data)
+      alert(`Schedule "${sched}" was created`)
       // alert(`A schedule with the name "${data[0].scheduleName}" was created`);
       // window.location.reload();
     })

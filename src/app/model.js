@@ -7,18 +7,23 @@ const scheduleSchema = new mongoose.Schema({
             scheduleName: {type: String, required: true},
             description: {type: String, default: ''},
             visibility: {type: String, default: 'private'},
+            numCourses: {type: Number, default: 0},
+            lastModified: {type: Date},
             courses: [
                 {
                     subject: {type: String},
                     course: {type: String},
-                    courseInfo: [{
-                        start: {type: String},
-                        end: {type: String},
-                    }],
+                    className: {type: String},
+                    start: {type: String},
+                    end: {type: String},
+                    campus: {type: String},
+                    room: {type: String},
+                    days: {type: Array},
+                    section: {type: Number},
+                    status: {type: String},
+                    summary: {type: String}
                 }
-            ],
-            numCourses: {type: Number, default: 0},
-            lastModified: {type: Date}
+            ]
         }
     ]
 })
