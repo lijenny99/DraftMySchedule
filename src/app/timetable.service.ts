@@ -63,7 +63,7 @@ export class TimetableService {
 
   // Delete a schedule with a given name
   deleteOne(schedule: string): Observable<any> {
-    return this.http.delete(`/schedules/${schedule}`,this.httpOptions).pipe(
+    return this.http.delete(`/schedules/${schedule}/alex@gmail.com`,this.httpOptions).pipe(
       catchError(this.handleError<any>())
     );
   }

@@ -8,9 +8,7 @@
             Schedule Name: {{x.sName}} ({{x.num}} courses)
             <div *ngIf="x.show">
               <div class="classDetail">Description: {{x.desc}}</div>
-                <div *ngFor="let y of courseLists">
-                  Course IDs: {{y.courseIDList}}
-                </div>
+                  Course IDs: {{x.courseIDList}}
             </div>
           </li>
     </ul>

@@ -63,8 +63,11 @@
   <h3>My Schedules</h3>
   <ul>
     <li *ngFor="let schedule of schedules">
+      <img [src]="schedule.vis == 'true' ? '../../assets/public.svg' : '../../assets/private.svg' ">
       {{schedule.sName}} ({{schedule.num}} courses)
+      <button class="details" (click)="view()">View</button>
       <button class="details" (click)="edit()">Edit</button>
+      <button class="details" (click)="deleteOne(schedule.sName)">Delete</button>
     </li>
   </ul>
   <div *ngIf="show" class="edit-schedule">
@@ -78,7 +81,7 @@
       <br>
       <label>Public?</label>
       <input formControlName="visibility" name="visibility" type="checkbox">
-      <button class="create" (click)="createSchedule()" [disabled]="!scheduleForm.valid">Create</button>
+      <button class="create" (click)="createSchedule()" [disabled]="!scheduleForm.valid">Update</button>
       <div *ngIf="scheduleForm.invalid && (scheduleForm.dirty || scheduleForm.touched)">
         <p *ngIf="scheduleForm.controls.schedule.errors?.required">
           Please enter a schedule name.

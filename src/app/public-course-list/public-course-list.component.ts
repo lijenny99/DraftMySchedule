@@ -15,7 +15,7 @@ export class PublicCourseListComponent implements OnInit {
     this.timetableService.getCourseLists().subscribe(data => {
       data.forEach(e => {
         e.schedules.forEach(el => {
-          if (el.visibility == "true") {
+          if (el.visibility == 'true') {
             this.courseLists.push({
               user: e.user,
               lastModified: el.lastModified,

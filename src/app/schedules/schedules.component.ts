@@ -50,7 +50,8 @@ export class SchedulesComponent implements OnInit {
       data[0].schedules.forEach(e=> {
         this.schedules.push({
           sName: e.scheduleName,
-          num: e.numCourses
+          num: e.numCourses,
+          vis: e.visibility,
         })
       })
     });
@@ -60,12 +61,14 @@ export class SchedulesComponent implements OnInit {
   createSchedule() {
     const sched = this.scheduleForm.controls.schedule.value
     const desc = this.scheduleForm.controls.description.value
-    const vis = this.scheduleForm.controls.visibility.value
+    let vis = this.scheduleForm.controls.visibility.value
+
+    if (vis == '')
+      vis = 'false'
 
     this.timetableService.createSchedule(sched,desc,vis).subscribe(data => {
-      alert(`Schedule "${sched}" was created`)
-      // alert(`A schedule with the name "${data[0].scheduleName}" was created`);
-      // window.location.reload();
+      alert(`A schedule with the name "${sched}" was created`)
+      window.location.reload();
     })
   }
 
@@ -82,13 +85,13 @@ export class SchedulesComponent implements OnInit {
     });
   }
 
-  // // Delete a schedule with a given name
-  // deleteOne(schedule: string) {
-  //   this.timetableService.deleteOne(schedule).subscribe(data => {
-  //     alert(data.message);
-  //     window.location.reload()
-  //   });
-  // }
+  // Delete a schedule with a given name
+  deleteOne(schedule: string) {
+    this.timetableService.deleteOne(schedule).subscribe(data => {
+      alert(data.message);
+      window.location.reload()
+    });
+  }
 
   // // Delete all schedules
   // deleteAll() {
@@ -139,5 +142,9 @@ export class SchedulesComponent implements OnInit {
 
   edit() {
     this.show = !this.show
+  }
+
+  view() {
+
   }
 }
