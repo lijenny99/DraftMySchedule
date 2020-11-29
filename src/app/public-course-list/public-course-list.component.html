@@ -1,13 +1,16 @@
 <div class="public-course-list">
     <h3>Public Course List</h3>
     <ul>
-        <li *ngFor="let x of courseLists | slice:0:10">
+        <li class="main" *ngFor="let x of courseLists | slice:0:10">
             <span class="bold">User: {{x.user}} <span class="italic">(Last Modified: {{x.lastModified}})</span></span>
             <button class="details" (click)="viewDetails(x)">Details</button>
             <br>
             Schedule Name: {{x.sName}} ({{x.num}} courses)
             <div *ngIf="x.show">
-              <span class="classDetail">Description: {{x.desc}}</span>
+              <div class="classDetail">Description: {{x.desc}}</div>
+                <div *ngFor="let y of courseLists">
+                  Course IDs: {{y.courseIDList}}
+                </div>
             </div>
           </li>
     </ul>

@@ -30,7 +30,7 @@
   <div class="schedule-builder">
     <button class="save" [class.disabled]="x.length == 0" [disabled]="x.length == 0" (click)="saveSchedule()" *ngIf="showSB">Save</button>
     <h3>Schedule Builder</h3>
-    <form>
+    <form class="sb">
       <label>Name:</label>
       <input [formControl]="scheduleName" name="schedule" type="text" />
       <button (click)="viewSchedule(scheduleName.value)" [disabled]="!scheduleName.valid">View</button>

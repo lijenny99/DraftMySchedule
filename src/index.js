@@ -199,16 +199,20 @@ app.put('/schedules/:name/:email', jsonParser, [
     const sName = req.params.name;
     const courses = req.body.courseList;
     const email = req.params.email
+    let courseIDs = []
+    courses.forEach(e => {
+        courseIDs.push(e.subject+' '+e.course)
+    })
 
     // Filter by specified schedule name 
     const checkName = await Schedule.find({email: email, 'schedules.scheduleName': sName});
 
     if (checkName != 0) { // Schedule exists
-        await Schedule.updateOne({email: email, schedules: {$elemMatch: {scheduleName: sName}}},{$set: {"schedules.$.courses": courses, "schedules.$.lastModified": Date(), "schedules.$.numCourses": courses.length}})
+        await Schedule.updateOne({email: email, schedules: {$elemMatch: {scheduleName: sName}}},{$set: {"schedules.$.courseList": courseIDs, "schedules.$.courses": courses, "schedules.$.lastModified": Date(), "schedules.$.numCourses": courses.length}})
         res.send(checkName)
     }
     else { // Schedule does not exist
-        res.status(404).send(`Schedule with name ${same} was not found!`);
+        res.status(404).send(`Schedule with name ${sName} was not found!`);
     }
 })
 

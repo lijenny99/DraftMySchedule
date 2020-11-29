@@ -9,6 +9,7 @@ const scheduleSchema = new mongoose.Schema({
             visibility: {type: String, default: 'private'},
             numCourses: {type: Number, default: 0},
             lastModified: {type: Date},
+            courseList: {type: Array},
             courses: [
                 {
                     subject: {type: String},

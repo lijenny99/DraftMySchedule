@@ -124,3 +124,7 @@ li {
 button.create {
     float: right;
 }
+
+.sb {
+    margin-bottom: 20px;
+}
