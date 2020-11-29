@@ -13,15 +13,20 @@ const scheduleSchema = new mongoose.Schema({
                 {
                     subject: {type: String},
                     course: {type: String},
-                    className: {type: String},
-                    start: {type: String},
-                    end: {type: String},
-                    campus: {type: String},
-                    room: {type: String},
-                    days: {type: Array},
-                    section: {type: Number},
-                    status: {type: String},
-                    summary: {type: String}
+                    courseInfo: [{
+                        className: {type: String},
+                        classNum: {type: String},
+                        component: {type: String},
+                        start: {type: String},
+                        end: {type: String},
+                        campus: {type: String},
+                        room: {type: String},
+                        days: {type: Array},
+                        section: {type: Number},
+                        status: {type: String},
+                        summary: {type: String}
+                        }
+                    ]
                 }
             ]
         }

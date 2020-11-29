@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
+import { takeWhile } from 'rxjs/operators';
 import { TimetableService } from '../timetable.service';
 
 @Component({
@@ -16,8 +17,14 @@ export class SchedulesComponent implements OnInit {
   public x = [];
   public exist = [];
   public show: boolean;
+  public showSB: boolean;
 
   // Form input
+  scheduleName = new FormControl('',[
+    Validators.required
+  ])
+
+
   scheduleForm = new FormGroup({
     schedule: new FormControl('',[
       Validators.required
@@ -27,9 +34,6 @@ export class SchedulesComponent implements OnInit {
   });
 
   scheduleBuilderForm = new FormGroup({
-    schedule: new FormControl('',[
-      Validators.required
-    ]),
     sub: new FormControl('',[
       Validators.required
     ]),
@@ -57,7 +61,7 @@ export class SchedulesComponent implements OnInit {
     const sched = this.scheduleForm.controls.schedule.value
     const desc = this.scheduleForm.controls.description.value
     const vis = this.scheduleForm.controls.visibility.value
-    console.log(vis)
+
     this.timetableService.createSchedule(sched,desc,vis).subscribe(data => {
       alert(`Schedule "${sched}" was created`)
       // alert(`A schedule with the name "${data[0].scheduleName}" was created`);
@@ -65,17 +69,18 @@ export class SchedulesComponent implements OnInit {
     })
   }
 
-  // // Get the list of subject code, course code pairs for a given schedule
-  // viewSchedule(schedule: string) {
-  //   this.timetableService.viewSchedule(schedule).subscribe(data => {
-  //     this.scheduleTimetable = data;
-  //     // Check if there are courses in the schedule
-  //     if (Object.keys(data).length == 0) {
-  //       alert(`There are no courses in schedule "${schedule}"`)
-  //     }
-  //   });
-  //   this.displaySched = 1;
-  // }
+  // Get the list of subject code, course code pairs for a given schedule
+  viewSchedule(schedule: string) {
+    this.x = [];
+    this.timetableService.viewSchedule(schedule).subscribe(data => {
+      data[0].schedules[0].courses.forEach(e=> {
+        this.exist.push(e.courseInfo[0].classNum)
+        this.x.push(e)
+      });
+
+      this.showSB = true;
+    });
+  }
 
   // // Delete a schedule with a given name
   // deleteOne(schedule: string) {
@@ -125,9 +130,9 @@ export class SchedulesComponent implements OnInit {
 
   // Save a list of subject code, course code pairs under a given schedule name
   saveSchedule() {
-    const sch = this.scheduleBuilderForm.controls.schedule.value
+    const sch = this.scheduleName.value
     this.timetableService.saveSchedule(sch,this.x).subscribe(data => {
-      alert(`Schedule ${data.scheduleName} has been built`)
+      alert(`Schedule ${sch} has been built`)
       window.location.reload()
     })
   }

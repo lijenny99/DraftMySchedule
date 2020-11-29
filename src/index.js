@@ -143,7 +143,6 @@ app.get('/schedules',async(req,res) => {
     }
 })
 
-
 app.post('/schedules', jsonParser, async(req,res) => {
     const email = req.body.email
     const sName = req.body.scheduleName
@@ -203,7 +202,7 @@ app.put('/schedules/:name/:email', jsonParser, [
 
     // Filter by specified schedule name 
     const checkName = await Schedule.find({email: email, 'schedules.scheduleName': sName});
-    console.log(checkName)
+
     if (checkName != 0) { // Schedule exists
         await Schedule.updateOne({email: email, schedules: {$elemMatch: {scheduleName: sName}}},{$set: {"schedules.$.courses": courses, "schedules.$.lastModified": Date(), "schedules.$.numCourses": courses.length}})
         res.send(checkName)
@@ -211,6 +210,36 @@ app.put('/schedules/:name/:email', jsonParser, [
     else { // Schedule does not exist
         res.status(404).send(`Schedule with name ${same} was not found!`);
     }
+})
+
+app.get('/schedules/:name', [
+    check("name").trim().escape(),
+], async (req,res) => {
+    // Store passed parameter as constant
+    const sName = req.params.name;
+
+    // Filter by specified schedule name 
+    const filter = await Schedule.find({email: 'alex@gmail.com', 'schedules.scheduleName': sName});;
+
+    if (filter != 0) {// Exists
+        const data = await Schedule.aggregate([
+            {
+                $match: {email: 'alex@gmail.com'}
+            },
+            {
+                $project: {
+                    schedules: {
+                        $filter: {
+                            input: "$schedules", as: "schedule", cond: {$eq: ["$$schedule.scheduleName",sName]}
+                        }
+                    }
+                }
+            }
+        ])
+        res.send(data);
+    }
+    else // Does not exist
+        res.status(404).send(`There is no schedule with the name ${sName}`)
 })
 
 // Question 4: Create a new schedule
@@ -272,7 +301,7 @@ app.put('/sched/:name', jsonParser, [
 })
 
 // Question 6: Get the list of subject code, course code pairs for a given schedule
-app.get('/schedules/:name', [
+app.get('/sched/:name', [
     check("name").trim().escape(),
 ], (req,res) => {
     // Store passed parameter as constant
