@@ -1,14 +1,11 @@
 <div class="left">
   <div class="schedules">
-    <!-- <button class="delete-all" id="delete-schedules" (click)="deleteAll()">Delete all</button>
-    <button class="view" id="get-schedules" (click)="getSchedules()">View all</button> -->
     <h3>Create a Schedule</h3>
     <form [formGroup]="scheduleForm">
       <label>Name:</label>
       <input formControlName="schedule" name="schedule" type="text" />
   
-      <!-- <button (click)="viewSchedule(schedule.value)" [disabled]="!schedule.valid">View</button>
-      <button (click)="deleteOne(schedule.value)" [disabled]="!schedule.valid">Delete</button> -->
+      <!-- <button (click)="viewSchedule(schedule.value)" [disabled]="!schedule.valid">View</button> -->
       <label>Description (optional):</label>
       <input formControlName="description" name="description" type="text" />
       <label>Public?</label>
@@ -65,7 +62,6 @@
     <li *ngFor="let schedule of schedules">
       <img [src]="schedule.vis == 'true' ? '../../assets/public.svg' : '../../assets/private.svg' ">
       {{schedule.sName}} ({{schedule.num}} courses)
-      <button class="details" (click)="view()">View</button>
       <button class="details" (click)="edit()">Edit</button>
       <button class="details" (click)="deleteOne(schedule.sName)">Delete</button>
     </li>

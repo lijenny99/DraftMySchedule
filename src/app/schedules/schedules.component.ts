@@ -87,19 +87,13 @@ export class SchedulesComponent implements OnInit {
 
   // Delete a schedule with a given name
   deleteOne(schedule: string) {
-    this.timetableService.deleteOne(schedule).subscribe(data => {
-      alert(data.message);
-      window.location.reload()
-    });
+    if(confirm(`Are you sure you want to delete the schedule "${schedule}"?`)) {
+      this.timetableService.deleteOne(schedule).subscribe(data => {
+        alert(data.message);
+        window.location.reload()
+      });
+    }
   }
-
-  // // Delete all schedules
-  // deleteAll() {
-  //   this.timetableService.deleteAll().subscribe(data => {
-  //     alert(data.message);
-  //     window.location.reload();
-  //   });
-  // }
 
   // Add course to schedule builder
   addCourse() {
@@ -144,7 +138,4 @@ export class SchedulesComponent implements OnInit {
     this.show = !this.show
   }
 
-  view() {
-
-  }
 }
