@@ -2,16 +2,25 @@ import { Injectable } from '@angular/core';
 import {AngularFireAuth} from '@angular/fire/auth'
 import { Observable, of } from 'rxjs';
 import * as firebase from 'firebase/app'
+import { CanActivate, Router, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 
 
 @Injectable({
   providedIn: 'root'
 })
-export class FirebaseService {
+export class FirebaseService implements CanActivate {
   
   public isLoggedIn;
-  constructor(public firebaseAuth : AngularFireAuth, public afAuth: AngularFireAuth) { }
+  constructor(public firebaseAuth : AngularFireAuth, public afAuth: AngularFireAuth, private router: Router) { }
 
+  canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
+    if (this.isLoggedIn) {
+      return true;
+    } else {
+      this.router.navigate(['/login']);
+      return false;
+    }
+  }
 
   async signin(email: string, password : string){
     await this.firebaseAuth.signInWithEmailAndPassword(email,password)

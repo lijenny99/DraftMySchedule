@@ -32,8 +32,9 @@ export class LoginComponent implements OnInit {
     const n = this.loginForm.controls.name.value;
     const e = this.loginForm.controls.email.value;
     const pwd = this.loginForm.controls.password.value;
-    await this.firebaseService.signup(e,pwd).then (res => {
+    await this.firebaseService.signup(e,pwd).then(res => {
       this.timetableService.register(n,e).subscribe();
+      this.router.navigate(['/schedule'])
     })
 
   }

@@ -39,7 +39,7 @@ const config = {
       {path: 'login', component: LoginComponent},
       {path: 'public', component: PublicCourseListComponent},
       {path: 'search', component: SubjectsComponent},
-      {path: 'schedule', component: SchedulesComponent},
+      {path: 'schedule', component: SchedulesComponent, canActivate: [FirebaseService]},
     ]),
     FormsModule,
     ReactiveFormsModule,
