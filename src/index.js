@@ -137,7 +137,7 @@ app.post('/register', jsonParser, async(req,res) => {
     } catch (err) {res.status(404).send(err)}
 })
 
-app.post('/reviews', jsonParser, async(req,res) => {
+app.post('/reviews', fbAuth, jsonParser, async(req,res) => {
     const subject = req.body.subject;
     const course = req.body.course;
     const cID = subject + " " + course;
@@ -172,7 +172,7 @@ app.post('/reviews', jsonParser, async(req,res) => {
     }
 })
 
-app.get('/schedules',async(req,res) => {
+app.get('/publicschedules',async(req,res) => {
     try {
         const schedules = await Schedule.find()
         res.send(schedules)
@@ -181,8 +181,18 @@ app.get('/schedules',async(req,res) => {
     }
 })
 
-app.post('/schedules', jsonParser, async(req,res) => {
-    const email = req.body.email
+app.get('/schedules', fbAuth, async(req,res) => {
+    const email = req.user
+    try {
+        const schedules = await Schedule.find({email: email})
+        res.send(schedules)
+    } catch (err) {
+        res.status(500).send(err.message)
+    }
+})
+
+app.post('/schedules', fbAuth, jsonParser, async(req,res) => {
+    const email = req.user
     const sName = req.body.scheduleName
     const v = req.body.visibility
     const desc = req.body.description
@@ -210,8 +220,8 @@ app.post('/schedules', jsonParser, async(req,res) => {
     }
 })
 
-app.put('/schedules/:name', jsonParser, async(req,res) => {
-    const email = req.body.email
+app.put('/schedules/:name', fbAuth, jsonParser, async(req,res) => {
+    const email = req.user
     const oldName = req.params.name
     const newName = req.body.scheduleName
     const newV = req.body.visibility
@@ -224,12 +234,12 @@ app.put('/schedules/:name', jsonParser, async(req,res) => {
 
 })
 
-app.delete('/schedules/:name/:email', [
+app.delete('/schedules/:name', fbAuth, [
     check("nameToDelete").trim().escape(),
 ], async (req,res) => {
     // Store passed parameter as constant
     const nameToDelete = req.params.name;
-    const email = req.params.email;
+    const email = req.user;
 
     // Filter by specified schedule name 
     const filter = await Schedule.find({email: email, 'schedules.scheduleName': nameToDelete});
@@ -243,14 +253,15 @@ app.delete('/schedules/:name/:email', [
     }
 })
 
-app.put('/schedules/:name/:email', jsonParser, [
+// FIX LATER
+app.post('/schedules/:name', fbAuth, jsonParser, [
     check("name").trim().escape(),
     check("courses").trim().escape(),
 ], async (req,res) => {
     // Store passed parameters as constants
     const sName = req.params.name;
     const courses = req.body.courseList;
-    const email = req.params.email
+    const email = req.user
     let courseIDs = []
     courses.forEach(e => {
         courseIDs.push(e.subject+' '+e.course)
@@ -268,19 +279,20 @@ app.put('/schedules/:name/:email', jsonParser, [
     }
 })
 
-app.get('/schedules/:name', [
+app.get('/schedules/:name', fbAuth, [
     check("name").trim().escape(),
 ], async (req,res) => {
     // Store passed parameter as constant
     const sName = req.params.name;
+    const email = req.user
 
     // Filter by specified schedule name 
-    const filter = await Schedule.find({email: 'alex@gmail.com', 'schedules.scheduleName': sName});;
+    const filter = await Schedule.find({email: email, 'schedules.scheduleName': sName});;
 
     if (filter != 0) {// Exists
         const data = await Schedule.aggregate([
             {
-                $match: {email: 'alex@gmail.com'}
+                $match: {email: email}
             },
             {
                 $project: {
@@ -298,6 +310,10 @@ app.get('/schedules/:name', [
         res.status(404).send(`There is no schedule with the name ${sName}`)
 })
 
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+// OLD CODE ------------------------------------------------------------------
 // Question 4: Create a new schedule
 app.post('/sched', jsonParser, [
     check("name").trim().escape()

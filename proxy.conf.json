@@ -43,5 +43,14 @@
     },
     "logLevel": "debug",
     "changeOrigin": true
+  },
+  "/publicschedules": {
+    "target": "http://localhost:3000/publicschedules",
+    "secure": true,
+    "pathRewrite": {
+      "^/publicschedules": ""
+    },
+    "logLevel": "debug",
+    "changeOrigin": true
   }
 }

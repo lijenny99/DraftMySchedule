@@ -4,7 +4,7 @@ const reviewSchema = new mongoose.Schema({
     reviews: [
         {
             review: {type: String, required: true},
-            visibility: {type: String, default: "hidden"}
+            visibility: {type: String, default: "public"}
         }
     ]
 })

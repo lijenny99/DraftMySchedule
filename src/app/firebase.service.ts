@@ -8,15 +8,12 @@ import * as firebase from 'firebase/app'
   providedIn: 'root'
 })
 export class FirebaseService {
-  isLoggedIn = false;
   
   constructor(public firebaseAuth : AngularFireAuth, public afAuth: AngularFireAuth) { }
 
   async signin(email: string, password : string){
     await this.firebaseAuth.signInWithEmailAndPassword(email,password)
     .then(res=>{
-      this.isLoggedIn = true
-      localStorage.setItem('user',JSON.stringify(res.user))
       alert('Login successful')
     }, err => alert(err.message))
   }
@@ -24,8 +21,6 @@ export class FirebaseService {
   async signup(email: string, password : string){
     await this.firebaseAuth.createUserWithEmailAndPassword(email,password)
     .then(res=>{
-        this.isLoggedIn = true
-        localStorage.setItem('user',JSON.stringify(res.user))
         alert('Account created')
     }, err => alert(err.message))
   }
@@ -39,11 +34,19 @@ export class FirebaseService {
     }, err => alert(err))
   }
 
-  logout(){
-      this.firebaseAuth.signOut()
-      localStorage.removeItem('user')
+  getToken() {
+    return new Promise<any>((res,rej) => {
+      this.afAuth.currentUser.then(user => {
+        if(user) {
+          user.getIdToken(true).then(id => {
+            res(id);
+        }, err => rej(err))} 
+        else {
+          console.log('No user logged in')
+        }
+      })
+    })
   }
-
 
   private handleError<T>(result?: T) {
       return (error: any): Observable<T> => {

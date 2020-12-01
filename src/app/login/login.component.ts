@@ -23,11 +23,11 @@ export class LoginComponent implements OnInit {
   });
 
   show: boolean = false;
-  isSignedIn = false;
 
   constructor(public firebaseService : FirebaseService, public timetableService: TimetableService, private router: Router) {}
   ngOnInit(){
   }
+
   async signUp(){
     const n = this.loginForm.controls.name.value;
     const e = this.loginForm.controls.email.value;
@@ -35,20 +35,14 @@ export class LoginComponent implements OnInit {
     await this.firebaseService.signup(e,pwd).then (res => {
       this.timetableService.register(n,e).subscribe();
     })
-    if (this.firebaseService.isLoggedIn)
-      this.isSignedIn = true;
+
   }
   async signIn(){
     const e = this.loginForm.controls.email.value;
     const pwd = this.loginForm.controls.password.value;
     await this.firebaseService.signin(e,pwd)
-    if (this.firebaseService.isLoggedIn)
-      this.isSignedIn = true;
   }
-  handleLogout(){
-    this.isSignedIn = false;
-  }
-
+  
   toggleLogin() {
     this.show = !this.show;
   }

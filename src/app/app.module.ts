@@ -8,7 +8,6 @@ import { AngularFireModule } from '@angular/fire'
 import { AppComponent } from './app.component';
 import { SubjectsComponent } from './subjects/subjects.component';
 import { SchedulesComponent } from './schedules/schedules.component';
-import { ScheduleBuilderComponent } from './schedule-builder/schedule-builder.component';
 import { CommonModule } from '@angular/common';
 import { LoginComponent } from './login/login.component';
 import { FirebaseService } from './firebase.service';
@@ -29,7 +28,6 @@ const config = {
     AppComponent,
     SubjectsComponent,
     SchedulesComponent,
-    ScheduleBuilderComponent,
     LoginComponent,
     PublicCourseListComponent,
   ],

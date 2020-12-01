@@ -12,7 +12,7 @@ export class PublicCourseListComponent implements OnInit {
   constructor(private timetableService: TimetableService) { }
 
   ngOnInit(): void {
-    this.timetableService.getCourseLists().subscribe(data => {
+    this.timetableService.getPublicSchedules().subscribe(data => {
       data.forEach(e => {
         e.schedules.forEach(el => {
           if (el.visibility == 'true') {

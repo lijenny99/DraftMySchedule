@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormControl, FormBuilder, Validators, FormArray } from '@angular/forms';
 import { TimetableService } from '../timetable.service';
+import { FirebaseService } from '../firebase.service';
 
 @Component({
   selector: 'app-schedules',
@@ -58,20 +59,24 @@ export class SchedulesComponent implements OnInit {
   });
   public dataItems = [];
 
-  constructor(private timetableService: TimetableService, private fb: FormBuilder) { }
+  constructor(private timetableService: TimetableService, private firebaseService: FirebaseService, private fb: FormBuilder) { }
 
   ngOnInit(): void {
-    this.timetableService.getSchedules()
-    .subscribe(data => {
-      data[0].schedules.forEach(e=> {
-        this.schedules.push({
-          sName: e.scheduleName,
-          num: e.numCourses,
-          vis: e.visibility,
-          show: false,
-        })
-      })
-    });
+    this.firebaseService.getToken().then(res => {
+      if(res) {
+        this.timetableService.getPrivateSchedules(res)
+        .subscribe(data => {
+          data[0].schedules.forEach(e=> {
+            this.schedules.push({
+              sName: e.scheduleName,
+              num: e.numCourses,
+              vis: e.visibility,
+              show: false,
+            })
+          })
+        });
+      }
+    })
   }
 
   // Create a new schedule
@@ -83,10 +88,14 @@ export class SchedulesComponent implements OnInit {
     if (vis == '')
       vis = "false"
 
-    this.timetableService.createSchedule(sched,desc,vis).subscribe(data => {
-      if (data) {
-        alert(`A schedule with the name "${sched}" was created`)
-        window.location.reload();
+    this.firebaseService.getToken().then(res => {
+      if(res) {
+        this.timetableService.createSchedule(res,sched,desc,vis).subscribe(data => {
+          if (data) {
+            alert(`A schedule with the name "${sched}" was created`)
+            window.location.reload();
+          }
+        })
       }
     })
   }
@@ -95,32 +104,46 @@ export class SchedulesComponent implements OnInit {
     const sched = this.editForm.controls.dataItems.value[0].schedule
     const desc = this.editForm.controls.dataItems.value[0].description
     let vis = this.editForm.controls.dataItems.value[0].visibility
-    this.timetableService.updateSchedule(sched,desc,vis,this.nameToUpdate).subscribe(data => {
-      alert('Update successful')
-      window.location.reload();
+
+    this.firebaseService.getToken().then(res => {
+      if(res) {
+        this.timetableService.updateSchedule(res,sched,desc,vis,this.nameToUpdate).subscribe(data => {
+          alert('Update successful')
+          window.location.reload();
+        })
+      }
     })
   }
 
   // Get the list of subject code, course code pairs for a given schedule
   viewSchedule(schedule: string) {
     this.x = [];
-    this.timetableService.viewSchedule(schedule).subscribe(data => {
-      data[0].schedules[0].courses.forEach(e=> {
-        this.exist.push(e.courseInfo[0].classNum)
-        this.x.push(e)
-      });
 
-      this.showSB = true;
-    });
+    this.firebaseService.getToken().then(res => {
+      if(res) {
+        this.timetableService.viewSchedule(res,schedule).subscribe(data => {
+          data[0].schedules[0].courses.forEach(e=> {
+            this.exist.push(e.courseInfo[0].classNum)
+            this.x.push(e)
+          });
+    
+          this.showSB = true;
+        });
+      }
+    })
   }
 
   // Delete a schedule with a given name
   deleteOne(schedule: string) {
     if(confirm(`Are you sure you want to delete the schedule "${schedule}"?`)) {
-      this.timetableService.deleteOne(schedule).subscribe(data => {
-        alert(data.message);
-        window.location.reload()
-      });
+      this.firebaseService.getToken().then(res => {
+        if(res) {
+          this.timetableService.deleteOne(res,schedule).subscribe(data => {
+            alert(data.message);
+            window.location.reload()
+          });
+        }
+      })
     }
   }
 
@@ -157,9 +180,14 @@ export class SchedulesComponent implements OnInit {
   // Save a list of subject code, course code pairs under a given schedule name
   saveSchedule() {
     const sch = this.scheduleName.value
-    this.timetableService.saveSchedule(sch,this.x).subscribe(data => {
-      alert(`Schedule ${sch} has been built`)
-      window.location.reload()
+
+    this.firebaseService.getToken().then(res => {
+      if(res) {
+        this.timetableService.saveSchedule(res,sch,this.x).subscribe(data => {
+          alert(`Schedule ${sch} has been built`)
+          window.location.reload()
+        })
+      }
     })
   }
 
@@ -168,29 +196,33 @@ export class SchedulesComponent implements OnInit {
     show = !show;
     this.show = true;
     this.nameToUpdate = schedule;
-    this.timetableService.viewSchedule(schedule).subscribe(data => {
-      if (data[0].schedules[0].visibility == "false") {
-        vis = false;
-      }
-      else {
-        vis = true;
-      }
-      this.dataItems = [
-        {
-          schedule: data[0].schedules[0].scheduleName,
-          description: data[0].schedules[0].description,
-          visibility: vis,
-        }
-      ];
-      this.editForm = new FormGroup({
-        dataItems: this.fb.array([])
-      });
-      this.editForm.setControl(
-        "dataItems",
-        this.setExistingItems(this.dataItems)
-      );
-      });
 
+    this.firebaseService.getToken().then(res => {
+      if(res) {
+        this.timetableService.viewSchedule(res,schedule).subscribe(data => {
+          if (data[0].schedules[0].visibility == "false") {
+            vis = false;
+          }
+          else {
+            vis = true;
+          }
+          this.dataItems = [
+            {
+              schedule: data[0].schedules[0].scheduleName,
+              description: data[0].schedules[0].description,
+              visibility: vis,
+            }
+          ];
+          this.editForm = new FormGroup({
+            dataItems: this.fb.array([])
+          });
+          this.editForm.setControl(
+            "dataItems",
+            this.setExistingItems(this.dataItems)
+          );
+          });
+      }
+    })
   }
 
   close() {
@@ -218,13 +250,16 @@ export class SchedulesComponent implements OnInit {
     const cc = this.reviewForm.controls.course.value.toUpperCase()
     const review = this.reviewForm.controls.review.value
 
-    this.timetableService.writeReview(sb,cc,review).subscribe( data => {
-      if (data) {
-        alert('Review posted!')
-        window.location.reload()
+    this.firebaseService.getToken().then(res => {
+      if(res) {
+        this.timetableService.writeReview(res,sb,cc,review).subscribe(data => {
+          if (data) {
+            alert('Review posted!')
+            window.location.reload()
+          }
+        })
       }
     })
-    
   }
 
 }

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
@@ -9,10 +9,6 @@ import { catchError } from 'rxjs/operators';
 export class TimetableService {
   
   constructor(private http: HttpClient) { }
-
-  httpOptions = {
-    headers: new HttpHeaders({'Content-Type': 'application/json'})
-  }
 
   // Get timetable entry for given subject code, course code and optional course component
   getTimetableInfo(sub: string, course: string): Observable<any> {
@@ -27,71 +23,73 @@ export class TimetableService {
     )
   }
 
-  getCourseLists(): Observable<any> {
-    return this.http.get(`/schedules`).pipe(
-      catchError(this.handleError<any>())
-    )
-  }
-
   register(user: string, email: string): Observable<any>  {
     return this.http.post<any>('/register',{"user": user, "email": email}).pipe(
       catchError(this.handleError<any>())
     )
   }
 
-  writeReview(sub: string, course: string, review: string): Observable<any>  {
-    return this.http.post<any>('/reviews',{"subject": sub, "course": course, "review": review}).pipe(
+  writeReview(token: string, sub: string, course: string, review: string): Observable<any>  {
+    const headers = {'Authorization':'Bearer ' + token}
+    return this.http.post<any>('/reviews',{"subject": sub, "course": course, "review": review},{headers}).pipe(
       catchError(this.handleError<any>())
     )
   }
 
   // Create a new schedule
-  createSchedule(schedule: string, description: string, visibility: boolean): Observable<any> {
-    return this.http.post<any>('/schedules/',{"scheduleName": schedule, "description": description, "visibility": visibility, "email": "alex@gmail.com"},this.httpOptions).pipe(
+  createSchedule(token: string, schedule: string, description: string, visibility: boolean): Observable<any> {
+    const headers = {'Authorization':'Bearer ' + token}
+    return this.http.post<any>('/schedules/',{"scheduleName": schedule, "description": description, "visibility": visibility},{headers}).pipe(
       catchError(this.handleError<any>())
     );
   }
 
-  updateSchedule(schedule: string, description: string, visibility: boolean, oldName: string): Observable<any> {
-    return this.http.put<any>(`/schedules/${oldName}`,{"scheduleName": schedule, "description": description, "visibility": visibility, "email": "alex@gmail.com"},this.httpOptions).pipe(
+  updateSchedule(token: string, schedule: string, description: string, visibility: boolean, oldName: string): Observable<any> {
+    const headers = {'Authorization':'Bearer ' + token}
+    return this.http.put<any>(`/schedules/${oldName}`,{"scheduleName": schedule, "description": description, "visibility": visibility},{headers}).pipe(
       catchError(this.handleError<any>())
     );
   }
 
   // Save a list of subject code, course code pairs under a given schedule name
-  saveSchedule(schedule: string, x: Array<{}>): Observable<any> {
-    return this.http.put(`/schedules/${schedule}/alex@gmail.com`,{"courseList": x},this.httpOptions).pipe(
+  saveSchedule(token: string, schedule: string, x: Array<{}>): Observable<any> {
+    const headers = {'Authorization':'Bearer ' + token}
+    return this.http.post(`/schedules/${schedule}`,{"courseList": x},{headers}).pipe(
       catchError(this.handleError<any>())
     );
   }
 
   // Get the list of subject code, course code pairs for a given schedule
-  viewSchedule(schedule: string): Observable<any> {
-    return this.http.get(`/schedules/${schedule}`).pipe(
+  viewSchedule(token: string, schedule: string): Observable<any> {
+    const headers = {'Authorization':'Bearer ' + token}
+    return this.http.get(`/schedules/${schedule}`,{headers}).pipe(
       catchError(this.handleError<any>())
     );
   }
 
   // Delete a schedule with a given name
-  deleteOne(schedule: string): Observable<any> {
-    return this.http.delete(`/schedules/${schedule}/alex@gmail.com`,this.httpOptions).pipe(
+  deleteOne(token: string, schedule: string): Observable<any> {
+    const headers = {'Authorization':'Bearer ' + token}
+    return this.http.delete(`/schedules/${schedule}`,{headers}).pipe(
       catchError(this.handleError<any>())
     );
   }
+
+  getPrivateSchedules(token: string): Observable<any> {
+    const headers = {'Authorization':'Bearer ' + token}
+    return this.http.get('/schedules',{headers}).pipe(
+      catchError(this.handleError<any>())
+    );
+  }
+
 
   // Get a list of schedule names and the number of courses that are saved in each schedule
-  getSchedules(): Observable<any> {
-    return this.http.get('/schedules').pipe(
+  getPublicSchedules(): Observable<any> {
+    return this.http.get('/publicschedules').pipe(
       catchError(this.handleError<any>())
     );
   }
 
-  // Delete all schedules
-  deleteAll(): Observable<any>{
-    return this.http.delete('/schedules').pipe(
-      catchError(this.handleError<any>())
-    );;
-  }
 
   // Handle failed HTTP operations
   private handleError<T>(result?: T) {
