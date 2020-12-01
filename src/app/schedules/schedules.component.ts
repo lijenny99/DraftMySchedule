@@ -18,6 +18,7 @@ export class SchedulesComponent implements OnInit {
   public show: boolean;
   public showSB: boolean;
   public nameToUpdate;
+  public name: string;
 
   // Form input
   scheduleName = new FormControl('',[
@@ -66,6 +67,7 @@ export class SchedulesComponent implements OnInit {
       if(res) {
         this.timetableService.getPrivateSchedules(res)
         .subscribe(data => {
+          this.name = data[0].user;
           data[0].schedules.forEach(e=> {
             this.schedules.push({
               sName: e.scheduleName,

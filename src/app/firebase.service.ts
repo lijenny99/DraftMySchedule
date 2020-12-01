@@ -9,12 +9,15 @@ import * as firebase from 'firebase/app'
 })
 export class FirebaseService {
   
+  public isLoggedIn;
   constructor(public firebaseAuth : AngularFireAuth, public afAuth: AngularFireAuth) { }
+
 
   async signin(email: string, password : string){
     await this.firebaseAuth.signInWithEmailAndPassword(email,password)
     .then(res=>{
       alert('Login successful')
+      this.isLoggedIn = true;
     }, err => alert(err.message))
   }
 
@@ -22,6 +25,7 @@ export class FirebaseService {
     await this.firebaseAuth.createUserWithEmailAndPassword(email,password)
     .then(res=>{
         alert('Account created')
+        this.isLoggedIn = true;
     }, err => alert(err.message))
   }
 
@@ -32,6 +36,23 @@ export class FirebaseService {
     await this.afAuth.signInWithPopup(provider).then(res => {
       console.log(res);
     }, err => alert(err))
+  }
+
+  // loggedIn() {
+  //   this.firebaseAuth.onAuthStateChanged((user) => {
+  //     if (user)
+  //       this.isLoggedIn = true;
+  //     else
+  //       this.isLoggedIn = false;
+  //   })
+  // }
+
+  signout() {
+    this.firebaseAuth.signOut().then(res => {
+      this.isLoggedIn = false;
+      alert('Successfully signed out!')
+    }).catch(err =>
+        console.log(err))
   }
 
   getToken() {

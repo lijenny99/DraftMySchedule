@@ -35,11 +35,11 @@ const config = {
     BrowserModule,
     AngularFireModule.initializeApp(config),
     RouterModule.forRoot([
-      {path: '', component: LoginComponent},
+      {path: '', redirectTo: 'login', pathMatch: 'full'},
+      {path: 'login', component: LoginComponent},
       {path: 'public', component: PublicCourseListComponent},
       {path: 'search', component: SubjectsComponent},
       {path: 'schedule', component: SchedulesComponent},
-      {path: 'secure', component: SchedulesComponent},
     ]),
     FormsModule,
     ReactiveFormsModule,

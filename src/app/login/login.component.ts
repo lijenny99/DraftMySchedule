@@ -40,7 +40,9 @@ export class LoginComponent implements OnInit {
   async signIn(){
     const e = this.loginForm.controls.email.value;
     const pwd = this.loginForm.controls.password.value;
-    await this.firebaseService.signin(e,pwd)
+    await this.firebaseService.signin(e,pwd).then(res => {
+      this.router.navigate(['/schedule'])
+    })
   }
   
   toggleLogin() {
@@ -49,7 +51,7 @@ export class LoginComponent implements OnInit {
 
   googleLogin() {
     this.firebaseService.loginWithGoogle().then(res => {
-      this.router.navigate(['/secure'])
+      this.router.navigate(['/schedule'])
     })
   }
 }

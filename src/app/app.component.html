@@ -1,8 +1,9 @@
 <nav>
   <a routerLink="/public">Public Course List</a>
   <a routerLink="/search">Search</a>
-  <a routerLink="/schedule">Draft My Schedule</a>
-  <a routerLink="/">Login</a>
+  <a routerLink="/schedule" *ngIf="firebaseService.isLoggedIn">Draft My Schedule</a>
+  <a routerLink="/login" *ngIf="!firebaseService.isLoggedIn">Login</a>
+  <a routerLink="/login" *ngIf="firebaseService.isLoggedIn" (click)="firebaseService.signout()">Logout</a>
 </nav>
   <h1>{{title}}</h1>
   <router-outlet></router-outlet>
