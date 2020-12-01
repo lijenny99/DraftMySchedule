@@ -62,26 +62,26 @@
     <li *ngFor="let schedule of schedules">
       <img [src]="schedule.vis == 'true' ? '../../assets/public.svg' : '../../assets/private.svg' ">
       {{schedule.sName}} ({{schedule.num}} courses)
-      <button class="details" (click)="edit()">Edit</button>
+      <button class="details" (click)="edit(schedule.sName, schedule.show)">Edit</button>
       <button class="details" (click)="deleteOne(schedule.sName)">Delete</button>
     </li>
   </ul>
   <div *ngIf="show" class="edit-schedule">
-    <form [formGroup]="scheduleForm">
-      <label>Name:</label>
-      <br>
-      <input formControlName="schedule" name="schedule" type="text" class="input-edit"/>
-      <br>
-      <label>Description (optional):</label>
-      <input formControlName="description" name="description" type="text" class="input-edit"/>
-      <br>
-      <label>Public?</label>
-      <input formControlName="visibility" name="visibility" type="checkbox">
-      <button class="create" (click)="createSchedule()" [disabled]="!scheduleForm.valid">Update</button>
-      <div *ngIf="scheduleForm.invalid && (scheduleForm.dirty || scheduleForm.touched)">
-        <p *ngIf="scheduleForm.controls.schedule.errors?.required">
-          Please enter a schedule name.
-        </p>
+    <button class="delete position" (click)="close()">x</button>
+    <form [formGroup]="editForm">
+      <div formArrayName="dataItems" *ngFor="let emp of editForm.get('dataItems').controls; let i = index">
+        <div [formGroupName]="i">
+          <label>Name:</label>
+          <br>
+          <input formControlName="schedule" name="schedule" type="text" class="input-edit"/>
+          <br>
+          <label>Description (optional):</label>
+          <input formControlName="description" name="description" type="text" class="input-edit"/>
+          <br>
+          <label>Public?</label>
+          <input formControlName="visibility" name="visibility" type="checkbox">
+          <button class="create" (click)="updateSchedule()">Update</button>
+        </div>
       </div>
     </form>
   </div>

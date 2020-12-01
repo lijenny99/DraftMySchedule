@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormGroup, FormControl, Validators } from '@angular/forms';
-import { takeWhile } from 'rxjs/operators';
+import { FormGroup, FormControl, FormBuilder, Validators, FormArray } from '@angular/forms';
 import { TimetableService } from '../timetable.service';
 
 @Component({
@@ -12,12 +11,12 @@ import { TimetableService } from '../timetable.service';
 export class SchedulesComponent implements OnInit {
   // Global variables
   public schedules = [];
-  public scheduleTimetable = [];
   public info = [];
   public x = [];
   public exist = [];
   public show: boolean;
   public showSB: boolean;
+  public nameToUpdate;
 
   // Form input
   scheduleName = new FormControl('',[
@@ -42,7 +41,12 @@ export class SchedulesComponent implements OnInit {
     ]),
   });
 
-  constructor(private timetableService: TimetableService) { }
+  editForm =  new FormGroup({
+    dataItems: this.fb.array([])
+  });
+  public dataItems = [];
+
+  constructor(private timetableService: TimetableService, private fb: FormBuilder) { }
 
   ngOnInit(): void {
     this.timetableService.getSchedules()
@@ -52,6 +56,7 @@ export class SchedulesComponent implements OnInit {
           sName: e.scheduleName,
           num: e.numCourses,
           vis: e.visibility,
+          show: false,
         })
       })
     });
@@ -64,10 +69,20 @@ export class SchedulesComponent implements OnInit {
     let vis = this.scheduleForm.controls.visibility.value
 
     if (vis == '')
-      vis = 'false'
+      vis = "false"
 
     this.timetableService.createSchedule(sched,desc,vis).subscribe(data => {
       alert(`A schedule with the name "${sched}" was created`)
+      window.location.reload();
+    })
+  }
+
+  updateSchedule() {
+    const sched = this.editForm.controls.dataItems.value[0].schedule
+    const desc = this.editForm.controls.dataItems.value[0].description
+    let vis = this.editForm.controls.dataItems.value[0].visibility
+    this.timetableService.updateSchedule(sched,desc,vis,this.nameToUpdate).subscribe(data => {
+      alert('Update successful')
       window.location.reload();
     })
   }
@@ -134,8 +149,53 @@ export class SchedulesComponent implements OnInit {
     })
   }
 
-  edit() {
-    this.show = !this.show
+  edit(schedule: string, show: boolean) {
+    let vis;
+    show = !show;
+    this.show = true;
+    this.nameToUpdate = schedule;
+    this.timetableService.viewSchedule(schedule).subscribe(data => {
+      if (data[0].schedules[0].visibility == "false") {
+        vis = false;
+      }
+      else {
+        vis = true;
+      }
+      this.dataItems = [
+        {
+          schedule: data[0].schedules[0].scheduleName,
+          description: data[0].schedules[0].description,
+          visibility: vis,
+        }
+      ];
+      this.editForm = new FormGroup({
+        dataItems: this.fb.array([])
+      });
+      this.editForm.setControl(
+        "dataItems",
+        this.setExistingItems(this.dataItems)
+      );
+      });
+
+  }
+
+  close() {
+    this.show = false;
+  }
+
+
+  setExistingItems(items): FormArray {
+    const formArray = new FormArray([]);
+    items.forEach(s => {
+      formArray.push(
+        this.fb.group({
+          schedule: s.schedule,
+          description: s.description,
+          visibility: s.visibility,
+        })
+      );
+    });
+    return formArray;
   }
 
 }

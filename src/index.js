@@ -172,6 +172,20 @@ app.post('/schedules', jsonParser, async(req,res) => {
     }
 })
 
+app.post('/schedules/:name', jsonParser, async(req,res) => {
+    const email = req.body.email
+    const oldName = req.params.name
+    const newName = req.body.scheduleName
+    const newV = req.body.visibility
+    const newDesc = req.body.description
+
+    await Schedule.updateOne({email: email, schedules: {$elemMatch: {scheduleName: oldName}}},{$set: {"schedules.$.scheduleName": newName, "schedules.$.visibility": newV, "schedules.$.lastModified": Date(), "schedules.$.description": newDesc}})
+    const data = await Schedule.find({})
+    res.status(200).send(data);
+
+
+})
+
 app.delete('/schedules/:name/:email', [
     check("nameToDelete").trim().escape(),
 ], async (req,res) => {

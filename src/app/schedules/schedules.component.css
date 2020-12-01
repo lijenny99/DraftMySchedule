@@ -67,7 +67,12 @@ button.delete {
     border: none;
     border-radius: 1px;
     color: white;
-  }
+}
+
+.position {
+    float: right;
+    margin-bottom: 5px;
+}
 
 .schedule-list {
     border: 2px solid darkseagreen;
