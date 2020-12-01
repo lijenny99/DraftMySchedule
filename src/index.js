@@ -30,6 +30,8 @@ const mdb = mongoose.connection
 
 Schedule = require('./app/model.js')
 
+const fbAuth = require('./fbAuth')
+
 // db.runCommand({"convertToCapped": "mycoll", size: 20});
 
 // Set up string similarity

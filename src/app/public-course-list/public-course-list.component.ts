@@ -8,7 +8,7 @@ import { TimetableService } from '../timetable.service';
 })
 export class PublicCourseListComponent implements OnInit {
   public courseLists = [];
-  public courseIDs = [];
+  public timetableInfo = [];
   constructor(private timetableService: TimetableService) { }
 
   ngOnInit(): void {
@@ -22,19 +22,28 @@ export class PublicCourseListComponent implements OnInit {
               sName: el.scheduleName,
               num: el.numCourses,
               desc: el.description,
-              courseIDList: el.courseList,
+              courseIDList: el.courseList.join(', '),
+              courses: el.courses
             })
-            console.log(el)
           }
         })
       })
-      console.log(this.courseLists)
       this.courseLists.sort((a,b) => new Date(b.lastModified).getTime() - new Date(a.lastModified).getTime())
     })
   }
 
   viewDetails(x) {
     x.show = !x.show;
+  }
+
+  expand(x) {
+    x.showDetails = !x.showDetails;
+    console.log(x.sName)
+    this.timetableInfo = [];
+    x.courses.forEach(e => {
+      this.timetableService.getTimetableInfo(e.subject, e.course).subscribe(data =>
+        this.timetableInfo.push(data))
+    })
   }
 
 }

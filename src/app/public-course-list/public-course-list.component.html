@@ -9,6 +9,14 @@
             <div *ngIf="x.show">
               <div class="classDetail">Description: {{x.desc}}</div>
                   Course IDs: {{x.courseIDList}}
+                  <button class="details" (click)="expand(x)">Expand</button>
+                  <div *ngIf="x.showDetails">
+                    <ul>
+                      <li *ngFor="let y of timetableInfo">
+                        {{y[0].subject}} {{y[0].courseCode}} {{y[0].component}} {{y[0].section}}: {{y[0].days}} {{y[0].start}}-{{y[0].end}} {{y[0].room}}
+                      </li>
+                    </ul>
+                  </div>
             </div>
           </li>
     </ul>

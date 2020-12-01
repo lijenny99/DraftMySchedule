@@ -44,6 +44,7 @@ export class FirebaseService {
       localStorage.removeItem('user')
   }
 
+
   private handleError<T>(result?: T) {
       return (error: any): Observable<T> => {
         // Display error in alert
