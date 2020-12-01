@@ -41,6 +41,18 @@ export class SchedulesComponent implements OnInit {
     ]),
   });
 
+  reviewForm = new FormGroup({
+    subject: new FormControl('',[
+      Validators.required
+    ]),
+    course: new FormControl('',[
+      Validators.required
+    ]),
+    review: new FormControl('',[
+      Validators.required
+    ]),
+  });
+
   editForm =  new FormGroup({
     dataItems: this.fb.array([])
   });
@@ -72,8 +84,10 @@ export class SchedulesComponent implements OnInit {
       vis = "false"
 
     this.timetableService.createSchedule(sched,desc,vis).subscribe(data => {
-      alert(`A schedule with the name "${sched}" was created`)
-      window.location.reload();
+      if (data) {
+        alert(`A schedule with the name "${sched}" was created`)
+        window.location.reload();
+      }
     })
   }
 
@@ -196,6 +210,21 @@ export class SchedulesComponent implements OnInit {
       );
     });
     return formArray;
+  }
+
+  submitReview() {
+    // Extract input values
+    const sb = this.reviewForm.controls.subject.value.toUpperCase()
+    const cc = this.reviewForm.controls.course.value.toUpperCase()
+    const review = this.reviewForm.controls.review.value
+
+    this.timetableService.writeReview(sb,cc,review).subscribe( data => {
+      if (data) {
+        alert('Review posted!')
+        window.location.reload()
+      }
+    })
+    
   }
 
 }

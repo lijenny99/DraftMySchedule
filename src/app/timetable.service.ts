@@ -39,6 +39,12 @@ export class TimetableService {
     )
   }
 
+  writeReview(sub: string, course: string, review: string): Observable<any>  {
+    return this.http.post<any>('/reviews',{"subject": sub, "course": course, "review": review}).pipe(
+      catchError(this.handleError<any>())
+    )
+  }
+
   // Create a new schedule
   createSchedule(schedule: string, description: string, visibility: boolean): Observable<any> {
     return this.http.post<any>('/schedules/',{"scheduleName": schedule, "description": description, "visibility": visibility, "email": "alex@gmail.com"},this.httpOptions).pipe(
@@ -47,7 +53,7 @@ export class TimetableService {
   }
 
   updateSchedule(schedule: string, description: string, visibility: boolean, oldName: string): Observable<any> {
-    return this.http.post<any>(`/schedules/${oldName}`,{"scheduleName": schedule, "description": description, "visibility": visibility, "email": "alex@gmail.com"},this.httpOptions).pipe(
+    return this.http.put<any>(`/schedules/${oldName}`,{"scheduleName": schedule, "description": description, "visibility": visibility, "email": "alex@gmail.com"},this.httpOptions).pipe(
       catchError(this.handleError<any>())
     );
   }

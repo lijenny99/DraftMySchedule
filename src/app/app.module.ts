@@ -31,14 +31,14 @@ const config = {
     SchedulesComponent,
     ScheduleBuilderComponent,
     LoginComponent,
-    PublicCourseListComponent
+    PublicCourseListComponent,
   ],
   imports: [
     BrowserModule,
     AngularFireModule.initializeApp(config),
     RouterModule.forRoot([
       {path: '', component: LoginComponent},
-      {path: 'courselist_public', component: PublicCourseListComponent},
+      {path: 'public', component: PublicCourseListComponent},
       {path: 'search', component: SubjectsComponent},
       {path: 'schedule', component: SchedulesComponent},
       {path: 'secure', component: SchedulesComponent},

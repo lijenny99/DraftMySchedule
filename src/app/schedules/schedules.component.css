@@ -80,9 +80,14 @@ button.delete {
     background-color: rgba(143, 188, 143, 0.25);
     padding: 10px 20px 10px 20px;
     margin-bottom: 30px;
-    position: relative;
-    float: right;
-    width: 30%;
+}
+
+.reviews {
+    border: 2px solid darkslateblue;
+    border-radius: 5px;
+    background-color: rgba(72, 61, 139, 0.25);
+    padding: 10px 20px 10px 20px;
+    margin-bottom: 30px;
 }
 
 li {
@@ -94,6 +99,12 @@ li {
     display: inline-block;
     width: 65%;
     clear: both;
+}
+
+.right {
+    position: relative;
+    float: right;
+    width: 30%;
 }
 
   .details {
@@ -123,6 +134,7 @@ li {
 .input-edit {
     width:95%;
     margin-bottom: 10px;
+    font-family: Arial, Helvetica, sans-serif
 }
 
 button.create {
@@ -137,3 +149,8 @@ img {
     width: 15px;
     height: auto;
 }
+
+textarea {
+    resize: none;
+}
+

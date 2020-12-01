@@ -4,8 +4,6 @@
     <form [formGroup]="scheduleForm">
       <label>Name:</label>
       <input formControlName="schedule" name="schedule" type="text" />
-  
-      <!-- <button (click)="viewSchedule(schedule.value)" [disabled]="!schedule.valid">View</button> -->
       <label>Description (optional):</label>
       <input formControlName="description" name="description" type="text" />
       <label>Public?</label>
@@ -17,12 +15,6 @@
         </p>
       </div>
     </form>
-    <ul>
-          <!-- <li *ngFor="let s of scheduleTimetable">
-            {{s.subject}} {{s.course}} {{s.courseInfo[0].component}} {{s.courseInfo[0].section}}: {{s.courseInfo[0].days}}
-            {{s.courseInfo[0].start}}-{{s.courseInfo[0].end}} ({{s.courseInfo[0].room}})
-          </li> -->
-    </ul>
   </div>
   <div class="schedule-builder">
     <button class="save" [class.disabled]="x.length == 0" [disabled]="x.length == 0" (click)="saveSchedule()" *ngIf="showSB">Save</button>
@@ -56,32 +48,56 @@
   </div>
 </div>
 
-<div class="schedule-list">
-  <h3>My Schedules</h3>
-  <ul>
-    <li *ngFor="let schedule of schedules">
-      <img [src]="schedule.vis == 'true' ? '../../assets/public.svg' : '../../assets/private.svg' ">
-      {{schedule.sName}} ({{schedule.num}} courses)
-      <button class="details" (click)="edit(schedule.sName, schedule.show)">Edit</button>
-      <button class="details" (click)="deleteOne(schedule.sName)">Delete</button>
-    </li>
-  </ul>
-  <div *ngIf="show" class="edit-schedule">
-    <button class="delete position" (click)="close()">x</button>
-    <form [formGroup]="editForm">
-      <div formArrayName="dataItems" *ngFor="let emp of editForm.get('dataItems').controls; let i = index">
-        <div [formGroupName]="i">
-          <label>Name:</label>
-          <br>
-          <input formControlName="schedule" name="schedule" type="text" class="input-edit"/>
-          <br>
-          <label>Description (optional):</label>
-          <input formControlName="description" name="description" type="text" class="input-edit"/>
-          <br>
-          <label>Public?</label>
-          <input formControlName="visibility" name="visibility" type="checkbox">
-          <button class="create" (click)="updateSchedule()">Update</button>
+<div class="right">
+  <div class="schedule-list">
+    <h3>My Schedules</h3>
+    <ul>
+      <li *ngFor="let schedule of schedules">
+        <img [src]="schedule.vis == 'true' ? '../../assets/public.svg' : '../../assets/private.svg' ">
+        {{schedule.sName}} ({{schedule.num}} courses)
+        <button class="details" (click)="edit(schedule.sName, schedule.show)">Edit</button>
+        <button class="details" (click)="deleteOne(schedule.sName)">Delete</button>
+      </li>
+    </ul>
+    <div *ngIf="show" class="edit-schedule">
+      <button class="delete position" (click)="close()">x</button>
+      <form [formGroup]="editForm">
+        <div formArrayName="dataItems" *ngFor="let emp of editForm.get('dataItems').controls; let i = index">
+          <div [formGroupName]="i">
+            <label>Name:</label>
+            <br>
+            <input formControlName="schedule" name="schedule" type="text" class="input-edit"/>
+            <br>
+            <label>Description (optional):</label>
+            <input formControlName="description" name="description" type="text" class="input-edit"/>
+            <br>
+            <label>Public?</label>
+            <input formControlName="visibility" name="visibility" type="checkbox">
+            <button class="create" (click)="updateSchedule()">Update</button>
+          </div>
         </div>
+      </form>
+    </div>
+  </div>
+  <div class="reviews">
+    <h3>Write a Review</h3>
+    <form [formGroup]="reviewForm">
+      <label>Subject:</label>
+
+      <input class="input-edit" formControlName="subject" name="subject" type="text" />
+      <br>
+      <label>Course Code:</label>
+      <input class="input-edit" formControlName="course" name="course" type="text" >
+      <br>
+      <label>Review:</label>
+      <br>
+      <textarea class="input-edit" rows="5" formControlName="review" name="review" type="text"></textarea>
+      <br>
+      <button (click)="submitReview()" [disabled]="!reviewForm.valid">Submit</button>
+      <div *ngIf="reviewForm.invalid && (reviewForm.dirty || reviewForm.touched)">
+        <p *ngIf="reviewForm.controls.subject.errors?.required || reviewForm.controls.course.errors?.required || reviewForm.controls.review.errors?.required">
+          Please fill in all values.
+        </p>
       </div>
     </form>
   </div>

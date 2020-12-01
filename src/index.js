@@ -28,7 +28,8 @@ const mdb = mongoose.connection
 // mdb.on('error', (error) => console.log(error))
 // mdb.once('open', () => console.log('Connnected to database'))
 
-Schedule = require('./app/model.js')
+Schedule = require('./app/scheduleModel.js')
+Review = require('./app/reviewModel.js')
 
 const fbAuth = require('./fbAuth')
 
@@ -136,6 +137,41 @@ app.post('/register', jsonParser, async(req,res) => {
     } catch (err) {res.status(404).send(err)}
 })
 
+app.post('/reviews', jsonParser, async(req,res) => {
+    const subject = req.body.subject;
+    const course = req.body.course;
+    const cID = subject + " " + course;
+    const newReview = req.body.review;
+    const filter = await Review.find({courseID: cID})
+    const entry = new Review({
+        courseID: cID,
+        reviews: [
+            {
+                review: newReview,
+            }
+        ]
+        
+    })
+
+    const data = timetable.filter(e => (e.subject === subject && e.catalog_nbr == course));
+
+    // Check if subject and course entry exists in timetable file
+    if (data!= 0)// Exists
+        if (filter != 0) {
+            await Review.updateOne({courseID: cID},{$push: {reviews: {review: newReview}}})
+            const all = await Review.find()
+            res.send(all)
+        }
+        else {
+            const newReview = await entry.save();
+            const all = await Review.find()
+            res.send(all)
+        }
+    else {
+        res.status(404).send(`${subject} ${course} does not exist`)
+    }
+})
+
 app.get('/schedules',async(req,res) => {
     try {
         const schedules = await Schedule.find()
@@ -174,7 +210,7 @@ app.post('/schedules', jsonParser, async(req,res) => {
     }
 })
 
-app.post('/schedules/:name', jsonParser, async(req,res) => {
+app.put('/schedules/:name', jsonParser, async(req,res) => {
     const email = req.body.email
     const oldName = req.params.name
     const newName = req.body.scheduleName

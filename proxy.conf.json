@@ -34,5 +34,14 @@
     },
     "logLevel": "debug",
     "changeOrigin": true
+  },
+  "/reviews": {
+    "target": "http://localhost:3000/reviews",
+    "secure": true,
+    "pathRewrite": {
+      "^/reviews": ""
+    },
+    "logLevel": "debug",
+    "changeOrigin": true
   }
 }
