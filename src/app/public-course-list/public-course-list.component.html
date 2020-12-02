@@ -12,8 +12,8 @@
                   <button class="details" (click)="expand(x)">Expand</button>
                   <div *ngIf="x.showDetails">
                     <ul>
-                      <li *ngFor="let y of timetableInfo">
-                        {{y[0].subject}} {{y[0].courseCode}} {{y[0].component}} {{y[0].section}}: {{y[0].days}} {{y[0].start}}-{{y[0].end}} {{y[0].room}}
+                      <li *ngFor="let y of x.courses">
+                        {{y.subject}} {{y.course}} {{y.courseInfo[0].component}} {{y.courseInfo[0].section}}: {{y.courseInfo[0].days}} {{y.courseInfo[0].start}}-{{y.courseInfo[0].end}} {{y.courseInfo[0].room}}
                       </li>
                     </ul>
                   </div>

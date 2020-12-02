@@ -8,7 +8,6 @@ import { TimetableService } from '../timetable.service';
 })
 export class PublicCourseListComponent implements OnInit {
   public courseLists = [];
-  public timetableInfo = [];
   constructor(private timetableService: TimetableService) { }
 
   ngOnInit(): void {
@@ -38,12 +37,5 @@ export class PublicCourseListComponent implements OnInit {
 
   expand(x) {
     x.showDetails = !x.showDetails;
-    console.log(x.sName)
-    this.timetableInfo = [];
-    x.courses.forEach(e => {
-      this.timetableService.getTimetableInfo(e.subject, e.course).subscribe(data =>
-        this.timetableInfo.push(data))
-    })
   }
-
 }
