@@ -10,8 +10,11 @@ import { CanActivate, Router, ActivatedRouteSnapshot, RouterStateSnapshot } from
 })
 export class FirebaseService implements CanActivate {
   
-  public isLoggedIn;
-  constructor(public firebaseAuth : AngularFireAuth, public afAuth: AngularFireAuth, private router: Router) { }
+  isLoggedIn = false;
+  constructor(public firebaseAuth : AngularFireAuth, public afAuth: AngularFireAuth, private router: Router) { 
+    if (localStorage.getItem('user'))
+      this.isLoggedIn = true
+  }
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
     if (this.isLoggedIn) {
@@ -25,16 +28,18 @@ export class FirebaseService implements CanActivate {
   async signin(email: string, password : string){
     await this.firebaseAuth.signInWithEmailAndPassword(email,password)
     .then(res=>{
-      alert('Login successful')
       this.isLoggedIn = true;
+      alert('Login successful')
+      localStorage.setItem('user',JSON.stringify(res.user))
     }, err => alert(err.message))
   }
 
   async signup(email: string, password : string){
     await this.firebaseAuth.createUserWithEmailAndPassword(email,password)
     .then(res=>{
-        alert('Account created')
-        this.isLoggedIn = true;
+      this.isLoggedIn = true;
+      localStorage.setItem('user',JSON.stringify(res.user))
+      alert('Account created')  
     }, err => alert(err.message))
   }
 
@@ -43,22 +48,17 @@ export class FirebaseService implements CanActivate {
     provider.addScope('profile');
     provider.addScope('email');
     await this.afAuth.signInWithPopup(provider).then(res => {
+      this.isLoggedIn = true;
       console.log(res);
     }, err => alert(err))
   }
 
-  // loggedIn() {
-  //   this.firebaseAuth.onAuthStateChanged((user) => {
-  //     if (user)
-  //       this.isLoggedIn = true;
-  //     else
-  //       this.isLoggedIn = false;
-  //   })
-  // }
-
   signout() {
     this.firebaseAuth.signOut().then(res => {
       this.isLoggedIn = false;
+      var user = firebase.default.auth().currentUser;
+      console.log(user)
+      localStorage.removeItem('user')
       alert('Successfully signed out!')
     }).catch(err =>
         console.log(err))

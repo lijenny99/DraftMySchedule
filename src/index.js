@@ -137,6 +137,15 @@ app.post('/register', jsonParser, async(req,res) => {
     } catch (err) {res.status(404).send(err)}
 })
 
+app.get('/reviews',async(req,res) => {
+    try {
+        const reviews = await Review.find()
+        res.send(reviews)
+    } catch (err) {
+        res.status(500).send(err.message)
+    }
+})
+
 app.post('/reviews', fbAuth, jsonParser, async(req,res) => {
     const subject = req.body.subject;
     const course = req.body.course;

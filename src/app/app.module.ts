@@ -12,6 +12,7 @@ import { CommonModule } from '@angular/common';
 import { LoginComponent } from './login/login.component';
 import { FirebaseService } from './firebase.service';
 import { PublicCourseListComponent } from './public-course-list/public-course-list.component';
+import { LandingComponent } from './landing/landing.component';
 
 const config = {
   apiKey: "AIzaSyB72rXHZQusPEFcgpxSl6wMLzWTKxpAUqk",
@@ -35,7 +36,7 @@ const config = {
     BrowserModule,
     AngularFireModule.initializeApp(config),
     RouterModule.forRoot([
-      {path: '', redirectTo: 'login', pathMatch: 'full'},
+      {path: '', component: LandingComponent},
       {path: 'login', component: LoginComponent},
       {path: 'public', component: PublicCourseListComponent},
       {path: 'search', component: SubjectsComponent},
