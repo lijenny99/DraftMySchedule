@@ -1,6 +1,6 @@
 <div class="left">
     <div class="user">
-        <h3>List of Active Users (Regular)</h3>
+        <h3>Active Users (Regular)</h3>
         <ul>
             <li *ngFor="let user of activeUsers">
               {{user.user}} ({{user.email}})
@@ -10,7 +10,7 @@
           </ul>
       </div>
       <div class="admin">
-        <h3>List of Active Users (Admin)</h3>
+        <h3>Active Users (Admin)</h3>
         <ul>
             <li *ngFor="let user of adminUsers">
               {{user.user}} ({{user.email}})
@@ -20,7 +20,7 @@
           </ul>
       </div>
       <div class="deactivated">
-        <h3>List of Deactivated Users</h3>
+        <h3>Deactivated Users</h3>
         <ul>
             <li *ngFor="let user of deactivatedUsers">
               {{user.user}} ({{user.email}})
@@ -32,7 +32,7 @@
 
 <div class="right">
     <div class="review">
-        <h3>List of Reviews</h3>
+        <h3>Reviews</h3>
         <ul>
             <li *ngFor="let review of reviews">
                 <span class="bold">

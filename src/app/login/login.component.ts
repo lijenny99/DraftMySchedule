@@ -39,11 +39,22 @@ export class LoginComponent implements OnInit {
 
   }
   async signIn(){
-    const e = this.loginForm.controls.email.value;
+    const em = this.loginForm.controls.email.value;
     const pwd = this.loginForm.controls.password.value;
-    await this.firebaseService.signin(e,pwd).then(res => {
+
+    await this.timetableService.getPublicSchedules().subscribe(data => {
+      data.forEach(e => {
+        if (em == e.email && e.accountStatus == "deactivated") {
+          alert('Your account has been deactivated. Please contact admin@gmail.com to resolve this issue.')
+          window.location.reload()
+        }
+      })
+    })
+    
+    await this.firebaseService.signin(em,pwd).then(res => {
       this.router.navigate(['/schedule'])
     })
+
   }
   
   toggleLogin() {

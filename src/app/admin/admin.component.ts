@@ -39,7 +39,6 @@ export class AdminComponent implements OnInit {
             text: p.review
           })
         })
-        
       })
     })
   }
