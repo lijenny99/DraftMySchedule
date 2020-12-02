@@ -92,10 +92,12 @@ app.get('/keyword/:keyword', [
 app.get('/subjects/:subject?/:course?', [
     check("subject").trim().escape(),
     check("course").trim().escape(),
-], (req, res) => {
+], async (req, res) => {
     // Store passed parameters as constants
     const subject = req.params.subject;
     const course = req.params.course;
+    
+    let r;
 
     // Filter by specified subject and course if it has a value and map timetable attributes to new array
     const data = timetable.filter(e => (
@@ -111,8 +113,20 @@ app.get('/subjects/:subject?/:course?', [
         room: e.course_info[0].facility_ID,
         component: e.course_info[0].ssr_component,
         classNum: e.course_info[0].class_nbr,
-        fullDescription: e.catalog_description,
+        fullDescription: e.catalog_description
     }));
+
+    data.forEach(async e => {
+        const id = e.subject + ' ' + e.courseCode;
+        const reviewFilter = await Review.find({courseID: id})
+        if (reviewFilter != 0) {
+            r = reviewFilter[0].reviews
+        }
+        else {
+            r = null
+        }
+        // data.push(r)
+    })
 
     // Check if subject and course and (optional) component entry exists in timetable file
     if (data!= 0)// Exists
