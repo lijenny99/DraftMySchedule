@@ -96,6 +96,18 @@ export class TimetableService {
     );
   }
 
+  reviewVisibility(c: string, r: string, v: string): Observable<any> {
+    return this.http.put('/reviews',{"courseID": c, "review": r, "visibility": v}).pipe(
+      catchError(this.handleError<any>())
+    );
+  }
+
+  changeAccountSettings(email: string, access: string, status: string): Observable<any> {
+    return this.http.put('/account',{"email": email, "access": access, "status": status}).pipe(
+      catchError(this.handleError<any>())
+    );
+  }
+
   // Handle failed HTTP operations
   private handleError<T>(result?: T) {
     return (error: any): Observable<T> => {

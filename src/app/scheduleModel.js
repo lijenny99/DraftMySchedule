@@ -2,6 +2,8 @@ const mongoose = require('mongoose')
 const scheduleSchema = new mongoose.Schema({
     user: {type: String, required: true},
     email: {type: String, required: true},
+    access: {type: String, default: 'regular'},
+    accountStatus: {type: String, default: 'active'},
     schedules: [
         {
             scheduleName: {type: String, required: true},

@@ -1,12 +1,29 @@
-.admin-user {
+.user {
     border: 2px solid goldenrod;
     border-radius: 5px;
     background-color: rgba(218, 165, 32, 0.25);
     padding: 10px 20px 10px 20px;
-    margin-bottom: 30px
+    margin-bottom: 30px;
 }
 
-.admin-review {
+.admin {
+    border: 2px solid tan;
+    border-radius: 5px;
+    background-color: rgba(210, 180, 140, 0.25);
+    padding: 10px 20px 10px 20px;
+    margin-bottom: 30px;
+}
+
+.deactivated {
+    border: 2px solid brown;
+    border-radius: 5px;
+    background-color: rgba(165, 42, 42, 0.25);
+    padding: 10px 20px 10px 20px;
+    margin-bottom: 30px;
+}
+
+
+.review {
     border: 2px solid olive;
     border-radius: 5px;
     background-color: rgba(128, 128, 0, 0.25);

@@ -1,27 +1,46 @@
 <div class="left">
-    <div class="admin-user">
-        <h3>List of Users</h3>
+    <div class="user">
+        <h3>List of Active Users (Regular)</h3>
         <ul>
-            <li *ngFor="let user of users">
-              {{user.user}}
-              <button class="details" (click)="adminAccess(user.user)">Grant Admin</button>
-              <button class="details" (click)="deactivate(user.user)">Deactivate</button>
+            <li *ngFor="let user of activeUsers">
+              {{user.user}} ({{user.email}})
+              <button class="details" (click)="adminAccess(user.email,user.access,user.accountStatus)">Grant Admin</button>
+              <button class="details" (click)="accountStatus(user.email,user.access,user.accountStatus)">Deactivate</button>
+            </li>
+          </ul>
+      </div>
+      <div class="admin">
+        <h3>List of Active Users (Admin)</h3>
+        <ul>
+            <li *ngFor="let user of adminUsers">
+              {{user.user}} ({{user.email}})
+              <button class="details" (click)="adminAccess(user.email,user.access,user.accountStatus)">Revoke Admin</button>
+              <button class="details" (click)="accountStatus(user.email,user.access,user.accountStatus)">Deactivate</button>
+            </li>
+          </ul>
+      </div>
+      <div class="deactivated">
+        <h3>List of Deactivated Users</h3>
+        <ul>
+            <li *ngFor="let user of deactivatedUsers">
+              {{user.user}} ({{user.email}})
+              <button class="details" (click)="accountStatus(user.email,user.access,user.accountStatus)">Reactivate</button>
             </li>
           </ul>
       </div>
 </div>
+
 <div class="right">
-    <div class="admin-review">
+    <div class="review">
         <h3>List of Reviews</h3>
         <ul>
             <li *ngFor="let review of reviews">
-            <span class="bold">
-                <img [src]="review.vis == 'hidden' ? '../../assets/invisible.svg' : '../../assets/visible.svg' ">
-                {{review.course}}</span>
-              <button class="details" (click)="toggleVisibility(review.visibility)">{{review.vis == "hidden" ? 'Show' : 'Hide'}}</button>
-              <br>
-              {{review.text}}
-              
+                <span class="bold">
+                    <img [src]="review.vis == 'hidden' ? '../../assets/invisible.svg' : '../../assets/visible.svg'">
+                    {{review.course}}</span>
+                    <button class="details" (click)="toggleVisibility(review.course,review.text,review.vis)">{{review.vis == "hidden" ? 'Show' : 'Hide'}}</button>
+                    <br>
+                    {{review.text}}           
             </li>
           </ul>
       </div>

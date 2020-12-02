@@ -52,5 +52,14 @@
     },
     "logLevel": "debug",
     "changeOrigin": true
+  },
+  "/account": {
+    "target": "http://localhost:3000/account",
+    "secure": true,
+    "pathRewrite": {
+      "^/account": ""
+    },
+    "logLevel": "debug",
+    "changeOrigin": true
   }
 }

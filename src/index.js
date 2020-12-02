@@ -195,6 +195,28 @@ app.post('/reviews', fbAuth, jsonParser, async(req,res) => {
     }
 })
 
+app.put('/reviews', jsonParser, async(req,res) => {
+ //   const email = req.user
+    const cID = req.body.courseID
+    const rev = req.body.review
+    const vis = req.body.visibility
+
+    await Review.updateOne({courseID: cID, reviews: {$elemMatch: {review: rev}}},{$set: {"reviews.$.visibility": vis}})
+    const data = await Review.find({courseID: cID})
+    res.status(200).send(data);
+})
+
+app.put('/account', jsonParser, async(req,res) => {
+    //   const email = req.user
+       const email = req.body.email
+       const access = req.body.access
+       const status = req.body.status
+   
+       await Schedule.updateOne({email: email},{$set: {"access": access, "accountStatus": status}})
+       const data = await Schedule.find({email: email})
+       res.status(200).send(data);
+   })
+
 app.get('/publicschedules',async(req,res) => {
     try {
         const schedules = await Schedule.find()

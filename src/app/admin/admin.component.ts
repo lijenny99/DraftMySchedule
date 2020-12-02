@@ -7,14 +7,26 @@ import { TimetableService } from '../timetable.service';
   styleUrls: ['./admin.component.css']
 })
 export class AdminComponent implements OnInit {
-  public users = []
+  public activeUsers = []
+  public adminUsers = []
+  public deactivatedUsers = []
   public reviews = []
   constructor(private timetableService: TimetableService) { }
 
   ngOnInit(): void {
     this.timetableService.getPublicSchedules().subscribe(data => {
       data.forEach(e => {
-        this.users.push(e)
+        if (e.accountStatus == "active") {
+          if (e.access == "regular") {
+            this.activeUsers.push(e)
+          } 
+          else {
+            this.adminUsers.push(e)
+          }
+        }
+        else {
+          this.deactivatedUsers.push(e)
+        }
       })
     })
 
@@ -31,4 +43,38 @@ export class AdminComponent implements OnInit {
       })
     })
   }
+
+  toggleVisibility(courseID: string, reviewBody: string, vis : string) {
+    if (vis == "hidden")
+      vis = "public"
+    else 
+      vis = "hidden"
+    this.timetableService.reviewVisibility(courseID, reviewBody, vis).subscribe(data => {
+      alert(`Review visibility for ${courseID} was changed to ${vis}`)
+      window.location.reload();
+    })
+  }
+
+  adminAccess(email: string, access: string, status: string) {
+    if (access == "admin")
+      access = "regular"
+    else
+      access = "admin"
+    this.timetableService.changeAccountSettings(email,access,status).subscribe(data => {
+      alert(`Access priviledges for ${email} were changed to ${access}`)
+      window.location.reload();
+    })
+  }
+
+  accountStatus(email: string, access: string, status: string) {
+    if (status == "active")
+      status = "deactivated"
+    else
+      status = "active"
+    this.timetableService.changeAccountSettings(email,access,status).subscribe(data => {
+      alert(`Account status for ${email} was changed to ${status}`)
+      window.location.reload();
+    })
+  }
+
 }
