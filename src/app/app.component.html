@@ -3,6 +3,7 @@
   <a routerLink="/public">Public Course List</a>
   <a routerLink="/search">Search</a>
   <a routerLink="/schedule" *ngIf="firebaseService.isLoggedIn">Draft My Schedule</a>
+  <a routerLink="/admin">Admin Panel</a>
   <a routerLink="/login" *ngIf="!firebaseService.isLoggedIn">Login</a>
   <a routerLink="/login" *ngIf="firebaseService.isLoggedIn" (click)="firebaseService.signout()">Logout</a>
 </nav>

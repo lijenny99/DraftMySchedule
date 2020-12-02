@@ -1,0 +1,28 @@
+<div class="left">
+    <div class="admin-user">
+        <h3>List of Users</h3>
+        <ul>
+            <li *ngFor="let user of users">
+              {{user.user}}
+              <button class="details" (click)="adminAccess(user.user)">Grant Admin</button>
+              <button class="details" (click)="deactivate(user.user)">Deactivate</button>
+            </li>
+          </ul>
+      </div>
+</div>
+<div class="right">
+    <div class="admin-review">
+        <h3>List of Reviews</h3>
+        <ul>
+            <li *ngFor="let review of reviews">
+            <span class="bold">
+                <img [src]="review.vis == 'hidden' ? '../../assets/invisible.svg' : '../../assets/visible.svg' ">
+                {{review.course}}</span>
+              <button class="details" (click)="toggleVisibility(review.visibility)">{{review.vis == "hidden" ? 'Show' : 'Hide'}}</button>
+              <br>
+              {{review.text}}
+              
+            </li>
+          </ul>
+      </div>
+</div>

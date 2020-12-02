@@ -13,6 +13,7 @@ import { LoginComponent } from './login/login.component';
 import { FirebaseService } from './firebase.service';
 import { PublicCourseListComponent } from './public-course-list/public-course-list.component';
 import { LandingComponent } from './landing/landing.component';
+import { AdminComponent } from './admin/admin.component';
 
 const config = {
   apiKey: "AIzaSyB72rXHZQusPEFcgpxSl6wMLzWTKxpAUqk",
@@ -31,6 +32,7 @@ const config = {
     SchedulesComponent,
     LoginComponent,
     PublicCourseListComponent,
+    AdminComponent,
   ],
   imports: [
     BrowserModule,
@@ -41,6 +43,7 @@ const config = {
       {path: 'public', component: PublicCourseListComponent},
       {path: 'search', component: SubjectsComponent},
       {path: 'schedule', component: SchedulesComponent, canActivate: [FirebaseService]},
+      {path: 'admin', component: AdminComponent},
     ]),
     FormsModule,
     ReactiveFormsModule,

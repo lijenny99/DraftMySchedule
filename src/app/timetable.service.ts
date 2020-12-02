@@ -90,6 +90,11 @@ export class TimetableService {
     );
   }
 
+  getReviews(): Observable<any> {
+    return this.http.get('/reviews').pipe(
+      catchError(this.handleError<any>())
+    );
+  }
 
   // Handle failed HTTP operations
   private handleError<T>(result?: T) {
