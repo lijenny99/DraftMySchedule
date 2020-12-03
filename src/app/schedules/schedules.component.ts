@@ -55,6 +55,18 @@ export class SchedulesComponent implements OnInit {
     ]),
   });
 
+  updatePasswordForm = new FormGroup({
+    current: new FormControl('',[
+      Validators.required
+    ]),
+    new: new FormControl('',[
+      Validators.required
+    ]),
+    confirm: new FormControl('',[
+      Validators.required
+    ]),
+  });
+
   editForm =  new FormGroup({
     dataItems: this.fb.array([])
   });
@@ -270,4 +282,21 @@ export class SchedulesComponent implements OnInit {
       })
     }
   }
+
+  updatePassword() {
+    let oldPwd = this.updatePasswordForm.controls.current.value
+    let newPwd = this.updatePasswordForm.controls.new.value
+    let confirmPwd = this.updatePasswordForm.controls.confirm.value
+    console.log(oldPwd,newPwd)
+    if (newPwd.length < 6) {
+      alert("Password must be at least 6 characters long")
+    }
+    else if(newPwd != confirmPwd) {
+      alert("Confirm password does not match")
+    }
+    else {
+      this.firebaseService.changePassword(oldPwd,newPwd)
+    }
+  }
+
 }

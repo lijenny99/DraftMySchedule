@@ -56,8 +56,6 @@ export class FirebaseService implements CanActivate {
   signout() {
     this.firebaseAuth.signOut().then(res => {
       this.isLoggedIn = false;
-      var user = firebase.default.auth().currentUser;
-      console.log(user)
       localStorage.removeItem('user')
       alert('Successfully signed out!')
     }).catch(err =>
@@ -76,6 +74,33 @@ export class FirebaseService implements CanActivate {
         }
       })
     })
+  }
+
+  updatePassword(pwd) {
+    return new Promise<any>((res,rej) => {
+      var user = firebase.default.auth().currentUser;
+      user.updatePassword(pwd).then(e => {
+        alert('Password has been updated')
+      }).catch(err => {
+        console.log(err)
+      })
+    })
+  }
+
+  async changePassword(oldPwd,newPwd) {
+    const user = firebase.default.auth().currentUser;
+    try {
+      await this.reauthenticate(oldPwd)
+      await this.updatePassword(newPwd)
+    } catch {
+      alert('Current password invalid')
+    }
+  }
+  
+  reauthenticate(currentPwd) {
+    const user = firebase.default.auth().currentUser;
+    const cred = firebase.default.auth.EmailAuthProvider.credential(user.email,currentPwd);
+    return user.reauthenticateWithCredential(cred);
   }
 
   private handleError<T>(result?: T) {

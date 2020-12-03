@@ -141,10 +141,6 @@ button.create {
     float: right;
 }
 
-.sb {
-    margin-bottom: 20px;
-}
-
 img {
     width: 15px;
     height: auto;
@@ -154,3 +150,14 @@ textarea {
     resize: none;
 }
 
+.password {
+    border: 2px solid royalblue;
+    border-radius: 5px;
+    background-color: rgba(65, 105, 225, 0.25);
+    padding: 10px 20px 10px 20px;
+    margin-bottom: 30px;  
+}
+
+input {
+    margin-bottom: 10px;
+}

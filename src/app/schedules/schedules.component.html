@@ -20,7 +20,7 @@
   <div class="schedule-builder">
     <button class="save" [class.disabled]="x.length == 0" [disabled]="x.length == 0" (click)="saveSchedule()" *ngIf="showSB">Save</button>
     <h3>Build a Schedule</h3>
-    <form class="sb">
+    <form>
       <label>Name:</label>
       <input [formControl]="scheduleName" name="schedule" type="text" />
       <button (click)="viewSchedule(scheduleName.value)" [disabled]="!scheduleName.valid">View</button>
@@ -97,6 +97,27 @@
       <button (click)="submitReview()" [disabled]="!reviewForm.valid">Submit</button>
       <div *ngIf="reviewForm.invalid && (reviewForm.dirty || reviewForm.touched)">
         <p *ngIf="reviewForm.controls.subject.errors?.required || reviewForm.controls.course.errors?.required || reviewForm.controls.review.errors?.required">
+          Please fill in all values.
+        </p>
+      </div>
+    </form>
+  </div>
+
+  <div class="password">
+    <h3>Update Password</h3>
+    <form [formGroup]="updatePasswordForm">
+      <label>Current Password:</label>
+      <input formControlName="current" name="current" type="password" />
+      <br>
+      <label>New Password:</label>
+      <input formControlName="new" name="new" type="password" />
+      <br>
+      <label>Confirm New Password:</label>
+      <input formControlName="confirm" name="confirm" type="password" />
+      <br>
+      <button (click)="updatePassword()" [disabled]="!updatePasswordForm.valid">Update</button>
+      <div *ngIf="updatePasswordForm.invalid && (updatePasswordForm.dirty || updatePasswordForm.touched)">
+        <p *ngIf="updatePasswordForm.controls.current.errors?.required || updatePasswordForm.controls.new.errors?.required || updatePasswordForm.controls.confirm.errors?.required">
           Please fill in all values.
         </p>
       </div>
