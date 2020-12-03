@@ -270,6 +270,15 @@ app.get('/policy/:name', async(req,res) => {
     }
 })
 
+app.get('/policy',async(req,res) => {
+    try {
+        const policies = await Policy.find()
+        res.send(policies)
+    } catch (err) {
+        res.status(500).send(err.message)
+    }
+})
+
 app.put('/policy', jsonParser, async(req,res) => {
     const policy = req.body.policy;
     const text = req.body.text;

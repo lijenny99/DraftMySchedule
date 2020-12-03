@@ -14,6 +14,7 @@ import { FirebaseService } from './firebase.service';
 import { PublicCourseListComponent } from './public-course-list/public-course-list.component';
 import { LandingComponent } from './landing/landing.component';
 import { AdminComponent } from './admin/admin.component';
+import { CopyrightComponent } from './copyright/copyright.component';
 
 const config = {
   apiKey: "AIzaSyB72rXHZQusPEFcgpxSl6wMLzWTKxpAUqk",
@@ -33,6 +34,7 @@ const config = {
     LoginComponent,
     PublicCourseListComponent,
     AdminComponent,
+    CopyrightComponent,
   ],
   imports: [
     BrowserModule,
@@ -44,6 +46,7 @@ const config = {
       {path: 'search', component: SubjectsComponent},
       {path: 'schedule', component: SchedulesComponent, canActivate: [FirebaseService]},
       {path: 'admin', component: AdminComponent},
+      {path: 'copyright', component: CopyrightComponent},
     ]),
     FormsModule,
     ReactiveFormsModule,

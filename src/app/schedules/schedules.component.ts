@@ -107,14 +107,19 @@ export class SchedulesComponent implements OnInit {
     const desc = this.editForm.controls.dataItems.value[0].description
     let vis = this.editForm.controls.dataItems.value[0].visibility
 
-    this.firebaseService.getToken().then(res => {
-      if(res) {
-        this.timetableService.updateSchedule(res,sched,desc,vis,this.nameToUpdate).subscribe(data => {
-          alert('Update successful')
-          window.location.reload();
-        })
-      }
-    })
+    if(sched == '') {
+      alert('Please enter a schedule name')
+    }
+    else {
+      this.firebaseService.getToken().then(res => {
+        if(res) {
+          this.timetableService.updateSchedule(res,sched,desc,vis,this.nameToUpdate).subscribe(data => {
+            alert('Update successful')
+            window.location.reload();
+          })
+        }
+      })
+    }
   }
 
   // Get the list of subject code, course code pairs for a given schedule
