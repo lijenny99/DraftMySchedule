@@ -30,6 +30,7 @@ const mdb = mongoose.connection
 
 Schedule = require('./app/scheduleModel.js')
 Review = require('./app/reviewModel.js')
+Policy = require('./app/policyModel.js')
 
 const fbAuth = require('./fbAuth')
 
@@ -258,6 +259,29 @@ app.put('/account', jsonParser, async(req,res) => {
        const data = await Schedule.find({email: email})
        res.status(200).send(data);
    })
+
+app.put('/policy', jsonParser, async(req,res) => {
+    const policy = req.body.policy;
+    const text = req.body.text;
+
+    const filter = await Policy.find({name: policy})
+    const entry = new Policy({
+        name: policy,
+        text: text
+    })
+
+    if (filter != 0) {
+        await Policy.updateOne({name: policy},{$set: {"text": text}})
+        const all = await Policy.find()
+        res.send(all)
+    }
+    else {
+        const newPolicy = await entry.save();
+        const all = await Policy.find()
+        res.send(all)
+    }
+
+})
 
 app.get('/publicschedules',async(req,res) => {
     try {

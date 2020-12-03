@@ -252,16 +252,17 @@ export class SchedulesComponent implements OnInit {
     const cc = this.reviewForm.controls.course.value.toUpperCase()
     const review = this.reviewForm.controls.review.value
 
-    this.firebaseService.getToken().then(res => {
-      if(res) {
-        this.timetableService.writeReview(res,sb,cc,review).subscribe(data => {
-          if (data) {
-            alert('Review posted!')
-            window.location.reload()
-          }
-        })
-      }
-    })
+    if(confirm(`Are you sure you want to post this review to ${sb} ${cc}?`)) {
+      this.firebaseService.getToken().then(res => {
+        if(res) {
+          this.timetableService.writeReview(res,sb,cc,review).subscribe(data => {
+            if (data) {
+              alert('Review posted!')
+              window.location.reload()
+            }
+          })
+        }
+      })
+    }
   }
-
 }

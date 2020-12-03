@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { TimetableService } from '../timetable.service';
+import { FormGroup, FormControl, FormBuilder, Validators, FormArray } from '@angular/forms';
 
 @Component({
   selector: 'app-admin',
@@ -11,7 +12,21 @@ export class AdminComponent implements OnInit {
   public adminUsers = []
   public deactivatedUsers = []
   public reviews = []
+  public show: boolean;
+
+  options = [
+    {desc: 'Security and Privacy Policy'},
+    {desc: 'DMCA Notice and Takedown Policy'},
+    {desc: 'Acceptable Use Policy'}
+  ]
+
   constructor(private timetableService: TimetableService) { }
+
+
+  dmcaForm = new FormGroup({
+    policy: new FormControl(''),
+    text: new FormControl(''),
+  });
 
   ngOnInit(): void {
     this.timetableService.getPublicSchedules().subscribe(data => {
@@ -74,6 +89,18 @@ export class AdminComponent implements OnInit {
       alert(`Account status for ${email} was changed to ${status}`)
       window.location.reload();
     })
+  }
+
+  policy() {
+    const policy = this.dmcaForm.controls.policy.value
+    const text = this.dmcaForm.controls.text.value
+    this.timetableService.updatePolicy(policy,text).subscribe(data => alert('Policy published!'))
+  }
+
+  toggleDisplay(value: string) {
+    console.log(value)
+    // this.show = !this.show
+    console.log('text')
   }
 
 }

@@ -28,10 +28,7 @@
             </li>
           </ul>
       </div>
-</div>
-
-<div class="right">
-    <div class="review">
+      <div class="review">
         <h3>Reviews</h3>
         <ul>
             <li *ngFor="let review of reviews">
@@ -44,4 +41,25 @@
             </li>
           </ul>
       </div>
+</div>
+
+<div class="right">
+<div class="dmca">
+  <h3>Site Copyright Enforcement</h3>
+  <form [formGroup]="dmcaForm">
+    <label>Select Policy:</label>
+    <select formControlName="policy" #t (change)="toggleDisplay(t.value)">
+      <option disabled value=""> -- Select an Option -- </option>
+      <option *ngFor="let o of options" [value]="o.desc">
+        {{o.desc}}
+      </option>
+    </select>
+    <br>
+    <br>
+    <span *ngIf="show">
+      <textarea class="input-edit" formControlName="text" rows="40" ></textarea>
+    </span>
+    <button (click)="policy()" [disabled]="!dmcaForm.controls.policy.touched">Submit</button>
+  </form>
+</div>
 </div>

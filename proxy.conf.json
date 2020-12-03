@@ -61,5 +61,14 @@
     },
     "logLevel": "debug",
     "changeOrigin": true
+  },
+  "/policy": {
+    "target": "http://localhost:3000/policy",
+    "secure": true,
+    "pathRewrite": {
+      "^/policy": ""
+    },
+    "logLevel": "debug",
+    "changeOrigin": true
   }
 }

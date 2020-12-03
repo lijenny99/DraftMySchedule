@@ -75,3 +75,17 @@ img {
     width: 15px;
     height: auto;
 }
+
+.dmca {
+    border: 2px solid oldlace;
+    border-radius: 5px;
+    background-color: rgba(253, 245, 230, 0.25);
+    padding: 10px 20px 10px 20px;
+    margin-bottom: 30px;
+}
+
+.input-edit {
+    width:95%;
+    margin-bottom: 10px;
+    font-family: Arial, Helvetica, sans-serif
+}
