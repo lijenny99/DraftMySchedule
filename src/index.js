@@ -97,7 +97,30 @@ app.get('/subjects/:subject?/:course?', [
     const subject = req.params.subject;
     const course = req.params.course;
     
-    let r;
+    // let r;
+    // const reviewSubject = [];
+
+    // const revs = timetable.filter(e => (
+    //     (e.subject === subject || e.catalog_nbr == subject) && (course ? (e.catalog_nbr.toString().indexOf(course) > -1) : true)
+    // )).map(e => ([{
+    //     su: e.subject,
+    //     ccode: e.catalog_nbr,
+    // }]));
+
+    // revs.forEach(async e => {
+    //     const id = e[0].su + ' ' + e[0].ccode;
+    //     const reviewFilter = await Review.find({courseID: id})
+    //     if (reviewFilter != 0) {
+    //         r = reviewFilter[0].reviews
+    //     }
+    //     else {
+    //         r = null
+    //     }
+    //     reviewSubject.push({
+    //         courseID: id,
+    //         reviews: r,
+    //     })
+    // })
 
     // Filter by specified subject and course if it has a value and map timetable attributes to new array
     const data = timetable.filter(e => (
@@ -113,20 +136,33 @@ app.get('/subjects/:subject?/:course?', [
         room: e.course_info[0].facility_ID,
         component: e.course_info[0].ssr_component,
         classNum: e.course_info[0].class_nbr,
-        fullDescription: e.catalog_description
+        fullDescription: e.catalog_description,
+        // courseID: e.subject+ ' '+ e.catalog_nbr
     }));
 
-    data.forEach(async e => {
-        const id = e.subject + ' ' + e.courseCode;
-        const reviewFilter = await Review.find({courseID: id})
-        if (reviewFilter != 0) {
-            r = reviewFilter[0].reviews
-        }
-        else {
-            r = null
-        }
-        // data.push(r)
-    })
+    // let merged = [];
+
+    // for(let i=0; i<data.length; i++) {
+    //     merged.push({
+    //      ...data[i], 
+    //      ...(reviewSubject.find((itmInner) => itmInner.id === data[i].id))}
+    //     );
+    //   }
+
+    // console.log(merged)
+    
+
+    // data.forEach(async e => {
+    //     const id = e.subject + ' ' + e.courseCode;
+    //     const reviewFilter = await Review.find({courseID: id})
+    //     if (reviewFilter != 0) {
+    //         r = reviewFilter[0].reviews
+    //     }
+    //     else {
+    //         r = null
+    //     }
+    //     // data.push(r)
+    // })
 
     // Check if subject and course and (optional) component entry exists in timetable file
     if (data!= 0)// Exists
@@ -161,16 +197,22 @@ app.get('/reviews',async(req,res) => {
 })
 
 app.post('/reviews', fbAuth, jsonParser, async(req,res) => {
+    const user = req.user;
     const subject = req.body.subject;
     const course = req.body.course;
     const cID = subject + " " + course;
     const newReview = req.body.review;
+
+    const name = await Schedule.find({email: user})
+
     const filter = await Review.find({courseID: cID})
     const entry = new Review({
         courseID: cID,
         reviews: [
             {
+                user: name[0].user,
                 review: newReview,
+                timePosted: new Date()
             }
         ]
         
@@ -181,7 +223,7 @@ app.post('/reviews', fbAuth, jsonParser, async(req,res) => {
     // Check if subject and course entry exists in timetable file
     if (data!= 0)// Exists
         if (filter != 0) {
-            await Review.updateOne({courseID: cID},{$push: {reviews: {review: newReview}}})
+            await Review.updateOne({courseID: cID},{$push: {reviews: {review: newReview, timePosted: new Date(), user: name[0].user}}})
             const all = await Review.find()
             res.send(all)
         }
