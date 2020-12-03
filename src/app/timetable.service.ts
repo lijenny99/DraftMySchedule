@@ -108,6 +108,12 @@ export class TimetableService {
     );
   }
 
+  viewPolicy(policy: string): Observable<any> {
+    return this.http.get(`/policy/${policy}`).pipe(
+      catchError(this.handleError<any>())
+    );
+  }
+
   updatePolicy(policy: string, text: string): Observable<any> {
     return this.http.put('/policy',{"policy": policy, "text": text}).pipe(
       catchError(this.handleError<any>())

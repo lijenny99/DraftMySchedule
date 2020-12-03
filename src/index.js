@@ -260,6 +260,16 @@ app.put('/account', jsonParser, async(req,res) => {
        res.status(200).send(data);
    })
 
+app.get('/policy/:name', async(req,res) => {
+    const name = req.params.name
+    try {
+        const policies = await Policy.find({name: name})
+        res.send(policies)
+    } catch (err) {
+        res.status(500).send(err.message)
+    }
+})
+
 app.put('/policy', jsonParser, async(req,res) => {
     const policy = req.body.policy;
     const text = req.body.text;

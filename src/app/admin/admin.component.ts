@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { TimetableService } from '../timetable.service';
-import { FormGroup, FormControl, FormBuilder, Validators, FormArray } from '@angular/forms';
+import { FormGroup, FormControl, FormBuilder, FormArray } from '@angular/forms';
 
 @Component({
   selector: 'app-admin',
@@ -14,18 +14,22 @@ export class AdminComponent implements OnInit {
   public reviews = []
   public show: boolean;
 
+  editForm =  new FormGroup({
+    dataItems: this.fb.array([])
+  });
+  public dataItems = [];
+
   options = [
     {desc: 'Security and Privacy Policy'},
     {desc: 'DMCA Notice and Takedown Policy'},
     {desc: 'Acceptable Use Policy'}
   ]
 
-  constructor(private timetableService: TimetableService) { }
+  constructor(private timetableService: TimetableService, private fb: FormBuilder) { }
 
 
   dmcaForm = new FormGroup({
     policy: new FormControl(''),
-    text: new FormControl(''),
   });
 
   ngOnInit(): void {
@@ -91,16 +95,55 @@ export class AdminComponent implements OnInit {
     })
   }
 
-  policy() {
+  submitPolicy() {
     const policy = this.dmcaForm.controls.policy.value
-    const text = this.dmcaForm.controls.text.value
-    this.timetableService.updatePolicy(policy,text).subscribe(data => alert('Policy published!'))
+    const text = this.editForm.controls.dataItems.value[0].text
+    this.timetableService.updatePolicy(policy,text).subscribe(data => {
+      alert('Policy published!')
+      window.location.reload();
+    })
   }
 
-  toggleDisplay(value: string) {
-    console.log(value)
-    // this.show = !this.show
-    console.log('text')
+  editPolicy(policy: string) {
+    this.show = true;
+
+    this.timetableService.viewPolicy(policy).subscribe(data => {
+      if (data!=0) {
+        this.dataItems = [
+          {
+            text: data[0].text,
+          }
+        ];
+      }
+        
+      else {
+        this.dataItems = [
+          {
+            text: ''
+          }
+        ];
+      }
+
+      this.editForm = new FormGroup({
+        dataItems: this.fb.array([])
+      });
+      this.editForm.setControl(
+        "dataItems",
+        this.setExistingItems(this.dataItems)
+      );
+    });
+  }
+
+  setExistingItems(items): FormArray {
+    const formArray = new FormArray([]);
+    items.forEach(s => {
+      formArray.push(
+        this.fb.group({
+          text: s.text,
+        })
+      );
+    });
+    return formArray;
   }
 
 }
