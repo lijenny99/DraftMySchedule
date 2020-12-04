@@ -10,31 +10,18 @@ const jsonParser = bodyParser.json()
 // Set up express-validator
 const { check, validationResult } = require('express-validator');
 
-// Set up lowdb
-const low = require('lowdb');
-const FileSync = require('lowdb/adapters/FileSync');
-const adapter = new FileSync('db.json');
-// const db = low(adapter);
-// db.defaults({schedules: []}).write();
-
 // Set up mongodb
 const mongoose = require('mongoose');
-mongoose.connect('mongodb+srv://jenny:jennifer123@lab5.4agzt.mongodb.net/database?retryWrites=true&w=majority', {useNewUrlParser: true, useUnifiedTopology: true}, (req, res) => {
-    console.log("Mongoose is running")
-})
+mongoose.connect('mongodb+srv://jenny:jennifer123@lab5.4agzt.mongodb.net/database?retryWrites=true&w=majority', {useNewUrlParser: true, useUnifiedTopology: true}, (req, res) => { console.log("Mongoose is running") })
 mongoose.set('useFindAndModify', false);
 const mdb = mongoose.connection
-
-// mdb.on('error', (error) => console.log(error))
-// mdb.once('open', () => console.log('Connnected to database'))
 
 Schedule = require('./app/scheduleModel.js')
 Review = require('./app/reviewModel.js')
 Policy = require('./app/policyModel.js')
 
+// Set up middleware
 const fbAuth = require('./fbAuth')
-
-// db.runCommand({"convertToCapped": "mycoll", size: 20});
 
 // Set up string similarity
 var stringSimilarity = require('string-similarity');
@@ -177,6 +164,7 @@ app.get('/subjects/:subject?/:course?', [
         
 })
 
+// Post user to mongoDB
 app.post('/register', jsonParser, async(req,res) => {
     const entry = new Schedule({
         user: req.body.user,
@@ -188,7 +176,8 @@ app.post('/register', jsonParser, async(req,res) => {
     } catch (err) {res.status(404).send(err)}
 })
 
-app.get('/reviews',async(req,res) => {
+// Get all reviews
+app.get('/reviews', async(req,res) => {
     try {
         const reviews = await Review.find()
         res.send(reviews)
@@ -197,6 +186,7 @@ app.get('/reviews',async(req,res) => {
     }
 })
 
+// User: Add review
 app.post('/reviews', fbAuth, jsonParser, async(req,res) => {
     const user = req.user;
     const subject = req.body.subject;
@@ -238,7 +228,8 @@ app.post('/reviews', fbAuth, jsonParser, async(req,res) => {
     }
 })
 
-app.put('/reviews', jsonParser, async(req,res) => {
+// Admin: Toggle review visibility
+app.put('/reviews', fbAuth, jsonParser, async(req,res) => {
  //   const email = req.user
     const cID = req.body.courseID
     const rev = req.body.review
@@ -249,7 +240,8 @@ app.put('/reviews', jsonParser, async(req,res) => {
     res.status(200).send(data);
 })
 
-app.put('/account', jsonParser, async(req,res) => {
+// Admin: Toggle account status and access
+app.put('/account', fbAuth, jsonParser, async(req,res) => {
     //   const email = req.user
        const email = req.body.email
        const access = req.body.access
@@ -260,8 +252,8 @@ app.put('/account', jsonParser, async(req,res) => {
        res.status(200).send(data);
    })
 
-
-app.get('/policy/:name', async(req,res) => {
+// Admin: View policy   
+app.get('/policy/:name', fbAuth, async(req,res) => {
     const name = req.params.name
     try {
         const policies = await Policy.find({name: name})
@@ -271,15 +263,7 @@ app.get('/policy/:name', async(req,res) => {
     }
 })
 
-app.get('/policy',async(req,res) => {
-    try {
-        const policies = await Policy.find()
-        res.send(policies)
-    } catch (err) {
-        res.status(500).send(err.message)
-    }
-})
-
+// Admin: Update policy
 app.put('/policy', jsonParser, async(req,res) => {
     const policy = req.body.policy;
     const text = req.body.text;
@@ -300,9 +284,19 @@ app.put('/policy', jsonParser, async(req,res) => {
         const all = await Policy.find()
         res.send(all)
     }
-
 })
 
+// Public: Display all policies 
+app.get('/policy',async(req,res) => {
+    try {
+        const policies = await Policy.find()
+        res.send(policies)
+    } catch (err) {
+        res.status(500).send(err.message)
+    }
+})
+
+// Public: View public schedules
 app.get('/publicschedules',async(req,res) => {
     try {
         const schedules = await Schedule.find()
@@ -311,6 +305,7 @@ app.get('/publicschedules',async(req,res) => {
         res.status(500).send(err.message)
     }
 })
+
 
 app.get('/schedules', fbAuth, async(req,res) => {
     const email = req.user
@@ -384,7 +379,6 @@ app.delete('/schedules/:name', fbAuth, [
     }
 })
 
-// FIX LATER
 app.post('/schedules/:name', fbAuth, jsonParser, [
     check("name").trim().escape(),
     check("courses").trim().escape(),
@@ -439,128 +433,6 @@ app.get('/schedules/:name', fbAuth, [
     }
     else // Does not exist
         res.status(404).send(`There is no schedule with the name ${sName}`)
-})
-
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-// OLD CODE ------------------------------------------------------------------
-// Question 4: Create a new schedule
-app.post('/sched', jsonParser, [
-    check("name").trim().escape()
-], (req,res) => {
-    // Store passed parameter as constant
-    const name = req.body.name;
-
-    const unsafeValues = [
-        '%21','%22','%23','%24','%25','%26','%27','%28','%29',
-        '%2A','%2B','%2C','%2D','%2E','%2F',
-        '%3A','%3B','%3C','%3D','%3E','%3F',
-        '%5B','%5C','%5D','%5E','%5F', '%60'
-    ]
-
-    var containsUnsafe = unsafeValues.some(item => name.includes(item));
-    if (containsUnsafe)
-        return res.status(422).send("Invalid input")
-
-    const decodeName = decodeURIComponent(name);
-    // Filter by specified schedule name 
-    const filter = db.get("schedules").filter({scheduleName: decodeName}).value()
-
-    // Check if schedule with name already exists
-    if (filter!=0) // Exists
-        res.status(404).send(`A schedule with the name ${decodeName} already exists!`)
-    else { // Does not exist
-        db.get("schedules").push({"scheduleName": decodeName, "courses":[],"numCourses": 0}).write()
-        const data = db.get("schedules").filter({scheduleName: decodeName}).value()
-        res.status(200).send(data);
-    }     
-})
-
-// Question 5: Save a list of subject code, course code pairs under a given schedule name
-app.put('/sched/:name', jsonParser, [
-    check("name").trim().escape(),
-    check("courses").trim().escape(),
-], (req,res) => {
-    // Store passed parameters as constants
-    const name = req.params.name;
-    const courses = req.body.courseList;
-
-    // Filter by specified schedule name 
-    const checkName = db.get("schedules").filter({scheduleName: name}).value();
-
-    if (checkName != 0) { // Schedule exists
-        db.get("schedules").find({scheduleName: name}).assign({courses: courses}).write()
-
-        const path = db.get("schedules").find({scheduleName: name}).get("courses")
-
-        db.get("schedules").find({scheduleName: name}).assign({numCourses: path.size()}).write()
-
-        res.send(db.get("schedules").find({scheduleName: name}).value())
-    }
-    else { // Schedule does not exist
-        res.status(404).send(`Schedule with name ${name} was not found!`);
-    }
-})
-
-// Question 6: Get the list of subject code, course code pairs for a given schedule
-app.get('/sched/:name', [
-    check("name").trim().escape(),
-], (req,res) => {
-    // Store passed parameter as constant
-    const name = req.params.name;
-
-    // Filter by specified schedule name 
-    const filter = db.get("schedules").filter({scheduleName: name}).value();
-
-    if (filter != 0) {// Exists
-        const data = db.get("schedules").find({scheduleName: name}).get("courses");
-        res.send(data);
-    }
-    else // Does not exist
-        res.status(404).send(`There is no schedule with the name ${name}`)
-})
-
-// Question 7: Delete a schedule with a given name
-app.delete('/sched/:name', [
-    check("nameToDelete").trim().escape(),
-], (req,res) => {
-    // Store passed parameter as constant
-    const nameToDelete = req.params.name;
-
-    // Filter by specified schedule name 
-    const filter = db.get("schedules").filter({scheduleName: nameToDelete}).value();
-
-    if (filter != 0) { // Exists
-        db.get("schedules").remove({"scheduleName": nameToDelete}).write()
-        res.send({message: `"${nameToDelete}" has been deleted`})
-    }
-    else { // Does not exist
-        res.status(404).send(`There is no schedule with the name ${nameToDelete}`)
-    }
-})
-
-// Question 8: Get a list of schedule names and the number of courses that are saved in each schedule
-app.get('/sched', (req,res) => {
-    // Map schedule name and number of courses attributes to new array
-    const data = db.get("schedules").map(e => (
-        {scheduleName: e.scheduleName, numCourses: e.numCourses}
-    )).value();
-    if (data != 0)
-        res.send(data);
-    else 
-        res.status(404).send("There are no schedules to display")
-})
-
-// Question 9: Delete all schedules
-app.delete('/schedules', (req,res) => {
-    const data = db.get("schedules")
-    if (data.size() != 0) {
-        data.remove().write();
-        res.send({message: "All schedules have been deleted"});
-    }
-    else
-        res.status(404).send("There are no schedules to delete")
 })
 
 // Parse data in body as JSON

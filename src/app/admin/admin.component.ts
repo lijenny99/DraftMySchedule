@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { TimetableService } from '../timetable.service';
 import { FormGroup, FormControl, FormBuilder, FormArray } from '@angular/forms';
+import { FirebaseService } from '../firebase.service';
 
 @Component({
   selector: 'app-admin',
@@ -25,7 +26,7 @@ export class AdminComponent implements OnInit {
     {desc: 'Acceptable Use Policy'}
   ]
 
-  constructor(private timetableService: TimetableService, private fb: FormBuilder) { }
+  constructor(private timetableService: TimetableService, private firebaseService: FirebaseService, private fb: FormBuilder) { }
 
 
   dmcaForm = new FormGroup({
@@ -33,32 +34,36 @@ export class AdminComponent implements OnInit {
   });
 
   ngOnInit(): void {
-    this.timetableService.getPublicSchedules().subscribe(data => {
-      data.forEach(e => {
-        if (e.accountStatus == "active") {
-          if (e.access == "regular") {
-            this.activeUsers.push(e)
-          } 
-          else {
-            this.adminUsers.push(e)
-          }
-        }
-        else {
-          this.deactivatedUsers.push(e)
-        }
-      })
-    })
-
-    this.timetableService.getReviews().subscribe(data => {
-      data.forEach(e => {
-        e.reviews.forEach(p => {
-          this.reviews.push({
-            course: e.courseID,
-            vis: p.visibility,
-            text: p.review
+    this.firebaseService.getToken().then(res => {
+      if(res) {
+        this.timetableService.getPublicSchedules().subscribe(data => {
+          data.forEach(e => {
+            if (e.accountStatus == "active") {
+              if (e.access == "regular") {
+                this.activeUsers.push(e)
+              } 
+              else {
+                this.adminUsers.push(e)
+              }
+            }
+            else {
+              this.deactivatedUsers.push(e)
+            }
           })
         })
-      })
+    
+        this.timetableService.getReviews().subscribe(data => {
+          data.forEach(e => {
+            e.reviews.forEach(p => {
+              this.reviews.push({
+                course: e.courseID,
+                vis: p.visibility,
+                text: p.review
+              })
+            })
+          })
+        })
+      }
     })
   }
 
@@ -67,9 +72,13 @@ export class AdminComponent implements OnInit {
       vis = "public"
     else 
       vis = "hidden"
-    this.timetableService.reviewVisibility(courseID, reviewBody, vis).subscribe(data => {
-      alert(`Review visibility for ${courseID} was changed to ${vis}`)
-      window.location.reload();
+    this.firebaseService.getToken().then(res => {
+      if(res) {
+        this.timetableService.reviewVisibility(res, courseID, reviewBody, vis).subscribe(data => {
+          alert(`Review visibility for ${courseID} was changed to ${vis}`)
+          window.location.reload();
+        })
+      }
     })
   }
 
@@ -78,9 +87,14 @@ export class AdminComponent implements OnInit {
       access = "regular"
     else
       access = "admin"
-    this.timetableService.changeAccountSettings(email,access,status).subscribe(data => {
-      alert(`Access priviledges for ${email} were changed to ${access}`)
-      window.location.reload();
+
+    this.firebaseService.getToken().then(res => {
+      if(res) {
+        this.timetableService.changeAccountSettings(res, email,access,status).subscribe(data => {
+          alert(`Access priviledges for ${email} were changed to ${access}`)
+          window.location.reload();
+        })
+      }
     })
   }
 
@@ -89,49 +103,58 @@ export class AdminComponent implements OnInit {
       status = "deactivated"
     else
       status = "active"
-    this.timetableService.changeAccountSettings(email,access,status).subscribe(data => {
-      alert(`Account status for ${email} was changed to ${status}`)
-      window.location.reload();
+    this.firebaseService.getToken().then(res => {
+      if(res) {
+        this.timetableService.changeAccountSettings(res,email,access,status).subscribe(data => {
+          alert(`Account status for ${email} was changed to ${status}`)
+          window.location.reload();
+        })
+      }
     })
   }
 
   submitPolicy() {
     const policy = this.dmcaForm.controls.policy.value
     const text = this.editForm.controls.dataItems.value[0].text
-    this.timetableService.updatePolicy(policy,text).subscribe(data => {
-      alert('Policy published!')
-      window.location.reload();
+    
+    this.firebaseService.getToken().then(res => {
+      if(res) {
+        this.timetableService.updatePolicy(res,policy,text).subscribe(data => {
+          alert('Policy published!')
+          window.location.reload();
+        })
+      }
     })
   }
 
   editPolicy(policy: string) {
     this.show = true;
 
-    this.timetableService.viewPolicy(policy).subscribe(data => {
-      if (data!=0) {
-        this.dataItems = [
-          {
-            text: data[0].text,
+    this.firebaseService.getToken().then(res => {
+      if(res) {
+        this.timetableService.viewPolicy(res,policy).subscribe(data => {
+          if (data!=0) {
+            this.dataItems = [
+              { text: data[0].text,}
+            ];
           }
-        ];
-      }
-        
-      else {
-        this.dataItems = [
-          {
-            text: ''
+            
+          else {
+            this.dataItems = [
+              { text: ''}
+            ];
           }
-        ];
+    
+          this.editForm = new FormGroup({
+            dataItems: this.fb.array([])
+          });
+          this.editForm.setControl(
+            "dataItems",
+            this.setExistingItems(this.dataItems)
+          );
+        });
       }
-
-      this.editForm = new FormGroup({
-        dataItems: this.fb.array([])
-      });
-      this.editForm.setControl(
-        "dataItems",
-        this.setExistingItems(this.dataItems)
-      );
-    });
+    })
   }
 
   setExistingItems(items): FormArray {

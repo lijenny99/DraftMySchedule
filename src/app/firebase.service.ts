@@ -10,12 +10,13 @@ import { TimetableService } from './timetable.service';
   providedIn: 'root'
 })
 export class FirebaseService {
-  public test = "wha"
   isAdmin = false;
   isLoggedIn = false;
   constructor(public firebaseAuth : AngularFireAuth, public afAuth: AngularFireAuth, private router: Router, public timetableService: TimetableService) { 
     if (localStorage.getItem('user'))
       this.isLoggedIn = true
+    if (localStorage.getItem('admin'))
+      this.isAdmin = true
   }
 
   async signin(email: string, password : string){
@@ -42,7 +43,7 @@ export class FirebaseService {
     provider.addScope('email');
     await this.afAuth.signInWithPopup(provider).then(res => {
       this.isLoggedIn = true;
-      console.log(res);
+      localStorage.setItem('user',JSON.stringify(res.user))
     }, err => alert(err))
   }
 
@@ -50,7 +51,9 @@ export class FirebaseService {
     this.firebaseAuth.signOut().then(res => {
       this.isLoggedIn = false;
       localStorage.removeItem('user')
+      localStorage.removeItem('admin')
       alert('Successfully signed out!')
+      window.location.reload();
     }).catch(err =>
         console.log(err))
   }
@@ -74,6 +77,7 @@ export class FirebaseService {
       var user = firebase.default.auth().currentUser;
       user.updatePassword(pwd).then(e => {
         alert('Password has been updated')
+        window.location.reload()
       }).catch(err => {
         console.log(err)
       })

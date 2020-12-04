@@ -96,20 +96,23 @@ export class TimetableService {
     );
   }
 
-  reviewVisibility(c: string, r: string, v: string): Observable<any> {
-    return this.http.put('/reviews',{"courseID": c, "review": r, "visibility": v}).pipe(
+  reviewVisibility(token: string, c: string, r: string, v: string): Observable<any> {
+    const headers = {'Authorization':'Bearer ' + token}
+    return this.http.put('/reviews',{"courseID": c, "review": r, "visibility": v},{headers}).pipe(
       catchError(this.handleError<any>())
     );
   }
 
-  changeAccountSettings(email: string, access: string, status: string): Observable<any> {
-    return this.http.put('/account',{"email": email, "access": access, "status": status}).pipe(
+  changeAccountSettings(token: string, email: string, access: string, status: string): Observable<any> {
+    const headers = {'Authorization':'Bearer ' + token}
+    return this.http.put('/account',{"email": email, "access": access, "status": status},{headers}).pipe(
       catchError(this.handleError<any>())
     );
   }
 
-  viewPolicy(policy: string): Observable<any> {
-    return this.http.get(`/policy/${policy}`).pipe(
+  viewPolicy(token: string, policy: string): Observable<any> {
+    const headers = {'Authorization':'Bearer ' + token}
+    return this.http.get(`/policy/${policy}`,{headers}).pipe(
       catchError(this.handleError<any>())
     );
   }
@@ -120,8 +123,9 @@ export class TimetableService {
     );
   }
 
-  updatePolicy(policy: string, text: string): Observable<any> {
-    return this.http.put('/policy',{"policy": policy, "text": text}).pipe(
+  updatePolicy(token: string, policy: string, text: string): Observable<any> {
+    const headers = {'Authorization':'Bearer ' + token}
+    return this.http.put('/policy',{"policy": policy, "text": text},{headers}).pipe(
       catchError(this.handleError<any>())
     );
   }
