@@ -16,6 +16,7 @@ import { LandingComponent } from './landing/landing.component';
 import { AdminComponent } from './admin/admin.component';
 import { CopyrightComponent } from './copyright/copyright.component';
 import { AuthGuardService } from './guards/auth-guard.service';
+import { RoleGuardService } from './guards/role-guard.service';
 
 const config = {
   apiKey: "AIzaSyB72rXHZQusPEFcgpxSl6wMLzWTKxpAUqk",
@@ -46,7 +47,7 @@ const config = {
       {path: 'public', component: PublicCourseListComponent},
       {path: 'search', component: SubjectsComponent},
       {path: 'schedule', component: SchedulesComponent, canActivate: [AuthGuardService]},
-      {path: 'admin', component: AdminComponent},
+      {path: 'admin', component: AdminComponent, canActivate: [RoleGuardService]},
       {path: 'copyright', component: CopyrightComponent},
     ]),
     FormsModule,

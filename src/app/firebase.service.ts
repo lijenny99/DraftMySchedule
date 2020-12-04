@@ -3,15 +3,17 @@ import {AngularFireAuth} from '@angular/fire/auth'
 import { Observable, of } from 'rxjs';
 import * as firebase from 'firebase/app'
 import { CanActivate, Router, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
+import { TimetableService } from './timetable.service';
 
 
 @Injectable({
   providedIn: 'root'
 })
 export class FirebaseService {
-  
+  public test = "wha"
+  isAdmin = false;
   isLoggedIn = false;
-  constructor(public firebaseAuth : AngularFireAuth, public afAuth: AngularFireAuth, private router: Router) { 
+  constructor(public firebaseAuth : AngularFireAuth, public afAuth: AngularFireAuth, private router: Router, public timetableService: TimetableService) { 
     if (localStorage.getItem('user'))
       this.isLoggedIn = true
   }

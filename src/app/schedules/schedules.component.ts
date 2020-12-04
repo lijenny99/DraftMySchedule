@@ -88,6 +88,10 @@ export class SchedulesComponent implements OnInit {
               show: false,
             })
           })
+          if(data[0].access === "admin") {
+            this.firebaseService.isAdmin = true;
+            localStorage.setItem('admin','yes')
+          }
         });
       }
     })
