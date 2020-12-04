@@ -12,7 +12,7 @@ import { TimetableService } from './timetable.service';
 export class FirebaseService {
   isAdmin = false;
   isLoggedIn = false;
-  constructor(public firebaseAuth : AngularFireAuth, public afAuth: AngularFireAuth, private router: Router, public timetableService: TimetableService) { 
+  constructor(public firebaseAuth : AngularFireAuth, private router: Router, public timetableService: TimetableService) { 
     if (localStorage.getItem('user'))
       this.isLoggedIn = true
     if (localStorage.getItem('admin'))
@@ -41,7 +41,7 @@ export class FirebaseService {
     const provider = new firebase.default.auth.GoogleAuthProvider();
     provider.addScope('profile');
     provider.addScope('email');
-    await this.afAuth.signInWithPopup(provider).then(res => {
+    await this.firebaseAuth.signInWithPopup(provider).then(res => {
       this.isLoggedIn = true;
       localStorage.setItem('user',JSON.stringify(res.user))
     }, err => alert(err))
@@ -60,7 +60,7 @@ export class FirebaseService {
 
   getToken() {
     return new Promise<any>((res,rej) => {
-      this.afAuth.currentUser.then(user => {
+      this.firebaseAuth.onAuthStateChanged(user => {
         if(user) {
           user.getIdToken(true).then(id => {
             res(id);
