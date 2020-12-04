@@ -287,7 +287,7 @@ export class SchedulesComponent implements OnInit {
     let oldPwd = this.updatePasswordForm.controls.current.value
     let newPwd = this.updatePasswordForm.controls.new.value
     let confirmPwd = this.updatePasswordForm.controls.confirm.value
-    console.log(oldPwd,newPwd)
+
     if (newPwd.length < 6) {
       alert("Password must be at least 6 characters long")
     }

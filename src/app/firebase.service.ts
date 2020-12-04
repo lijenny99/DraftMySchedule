@@ -8,21 +8,12 @@ import { CanActivate, Router, ActivatedRouteSnapshot, RouterStateSnapshot } from
 @Injectable({
   providedIn: 'root'
 })
-export class FirebaseService implements CanActivate {
+export class FirebaseService {
   
   isLoggedIn = false;
   constructor(public firebaseAuth : AngularFireAuth, public afAuth: AngularFireAuth, private router: Router) { 
     if (localStorage.getItem('user'))
       this.isLoggedIn = true
-  }
-
-  canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
-    if (this.isLoggedIn) {
-      return true;
-    } else {
-      this.router.navigate(['/login']);
-      return false;
-    }
   }
 
   async signin(email: string, password : string){

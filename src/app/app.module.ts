@@ -15,6 +15,7 @@ import { PublicCourseListComponent } from './public-course-list/public-course-li
 import { LandingComponent } from './landing/landing.component';
 import { AdminComponent } from './admin/admin.component';
 import { CopyrightComponent } from './copyright/copyright.component';
+import { AuthGuardService } from './guards/auth-guard.service';
 
 const config = {
   apiKey: "AIzaSyB72rXHZQusPEFcgpxSl6wMLzWTKxpAUqk",
@@ -44,7 +45,7 @@ const config = {
       {path: 'login', component: LoginComponent},
       {path: 'public', component: PublicCourseListComponent},
       {path: 'search', component: SubjectsComponent},
-      {path: 'schedule', component: SchedulesComponent, canActivate: [FirebaseService]},
+      {path: 'schedule', component: SchedulesComponent, canActivate: [AuthGuardService]},
       {path: 'admin', component: AdminComponent},
       {path: 'copyright', component: CopyrightComponent},
     ]),
@@ -53,7 +54,7 @@ const config = {
     HttpClientModule,
     CommonModule
   ],
-  providers: [FirebaseService],
+  providers: [FirebaseService, AuthGuardService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
