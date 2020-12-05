@@ -34,18 +34,22 @@ export class LoginComponent implements OnInit {
     const e = this.loginForm.controls.email.value;
     const pwd = this.loginForm.controls.password.value;
     
-    await this.firebaseService.signup(e,pwd).then(res => {
-      // Check if user is logged in
-      this.firebaseService.getToken().then(res => {
-        if(res) {
-          // Add user to database
-          this.timetableService.register(res,n,e).subscribe();
-          // Redirect to schedule page
-          this.router.navigate(['/schedule'])
-        }
+    if(n == '') {
+      alert('Please enter a name')
+    }
+    else {
+      await this.firebaseService.signup(e,pwd).then(res => {
+        // Check if user is logged in
+        this.firebaseService.getToken().then(res => {
+          if(res) {
+            // Add user to database
+            this.timetableService.register(res,n,e).subscribe();
+            // Redirect to schedule page
+            this.router.navigate(['/schedule'])
+          }
+        })
       })
-    })
-
+    }
   }
   async signIn(){
     // Extract input values

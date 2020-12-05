@@ -22,7 +22,13 @@
       {{subject.component}} {{subject.section}}: {{subject.days}}
       {{subject.start}}-{{subject.end}} {{subject.room}}
       <div *ngIf="subject.show">
-        <div class="classDetail">{{subject.fullDescription}}</div>
+        <div class="classDetail">
+          {{subject.fullDescription}}
+          <br>
+          {{subject.importantInfo}}
+          <br>
+          {{subject.enrollment}}
+        </div>
       </div>
     </li>
   </ul>

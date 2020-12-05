@@ -90,6 +90,8 @@ app.get('/subjects/:subject?/:course?', [
         component: e.course_info[0].ssr_component,
         classNum: e.course_info[0].class_nbr,
         fullDescription: e.catalog_description,
+        importantInfo: e.course_info[0].descr,
+        enrollment: e.course_info[0].enrl_stat
         // courseID: e.subject+ ' '+ e.catalog_nbr
     }));
 
@@ -158,6 +160,8 @@ app.get('/keyword/:keyword', [
         component: e.course_info[0].ssr_component,
         classNum: e.course_info[0].class_nbr,
         fullDescription: e.catalog_description,
+        importantInfo: e.course_info[0].descr,
+        enrollment: e.course_info[0].enrl_stat
     }));
 
     // Check if subject and course and (optional) component entry exists in timetable file
@@ -375,7 +379,6 @@ app.delete('/schedules/:name', fbAuth, [
 // User: Save new course list to schedule
 app.post('/schedules/:name', fbAuth, jsonParser, [
     check("name").trim().escape(),
-    check("courseList").trim().escape(),
 ], async (req,res) => {
     // Store passed parameters as constants
     const sName = req.params.name;
@@ -387,10 +390,14 @@ app.post('/schedules/:name', fbAuth, jsonParser, [
     courses.forEach(e => {
         courseIDs.push(e.subject+' '+e.course)
     })
+    
+    // Filter by a specified schedule name
+    const checkName = await Schedule.find({email: email, 'schedules.scheduleName': sName})
 
     try {
         // Update course information in schedule
         await Schedule.updateOne({email: email, schedules: {$elemMatch: {scheduleName: sName}}},{$set: {"schedules.$.courseList": courseIDs, "schedules.$.courses": courses, "schedules.$.lastModified": Date(), "schedules.$.numCourses": courses.length}})
+        
         res.send(checkName)
     } catch (err) {
         res.status(500).send(err.message)

@@ -7,7 +7,7 @@ import { FirebaseService } from './firebase.service';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  title = 'SE3316 Lab 5';
+  title = 'Western Timetable';
 
   constructor(public firebaseService: FirebaseService) {}
 }
