@@ -8,6 +8,7 @@ import { TimetableService } from '../timetable.service';
 })
 export class CopyrightComponent implements OnInit {
 
+  // Global variables
   public sp: string;
   public dmca: string;
   public aup: string
@@ -15,6 +16,7 @@ export class CopyrightComponent implements OnInit {
   constructor(private timetableService: TimetableService) { }
 
   ngOnInit(): void {
+    // Populate page
     this.timetableService.viewAllPolicies().subscribe(data => {
       data.forEach(e => {
         if (e.name == "Security and Privacy Policy")

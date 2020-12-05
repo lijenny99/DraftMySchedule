@@ -12,9 +12,9 @@ export class RoleGuardService {
 
 
   canActivate(next: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
-    if (this.firebaseService.isAdmin) {
+    if (this.firebaseService.isAdmin) { // If user is admin, return true
       return true;
-    } else {
+    } else { // Otherwise, reroute to schedule page
       this.router.navigate(['/schedule']);
       return false;
     }

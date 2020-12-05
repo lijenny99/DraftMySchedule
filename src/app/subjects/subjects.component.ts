@@ -30,17 +30,18 @@ export class SubjectsComponent implements OnInit {
     const cs = this.subjectsForm.controls.course.value.toUpperCase()
     const key = this.subjectsForm.controls.keyword.value.toUpperCase()
     
-    if (s) {
+    if (s) { // Search by subject and optional course code component
       this.timetableService.getTimetableInfo(s, cs).subscribe(data => this.timetableInfo = data)
     }
-    else if (cs && !s) {
+    else if (cs && !s) { // Search by course code only
       this.timetableService.getTimetableInfo(cs, '').subscribe(data => this.timetableInfo = data)
     }
-    else {
+    else { // Search by keyword
       this.timetableService.getKeywordInfo(key).subscribe(data => this.timetableInfo = data)
     }
   }
 
+  // Toggle details view
   viewDetails(subject) {
     subject.show = !subject.show;
   }

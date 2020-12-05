@@ -344,10 +344,14 @@ app.put('/schedules/:name', fbAuth, jsonParser, [
         return res.status(422).send(`Schedule name must be at least 3 characters`)
     }
     
-    // Update schedule information
-    await Schedule.updateOne({email: email, schedules: {$elemMatch: {scheduleName: oldName}}},{$set: {"schedules.$.scheduleName": newName, "schedules.$.visibility": newV, "schedules.$.lastModified": Date(), "schedules.$.description": newDesc}})
-    const data = await Schedule.find({})
-    res.status(200).send(data);
+    try {
+        // Update schedule information
+        await Schedule.updateOne({email: email, schedules: {$elemMatch: {scheduleName: oldName}}},{$set: {"schedules.$.scheduleName": newName, "schedules.$.visibility": newV, "schedules.$.lastModified": Date(), "schedules.$.description": newDesc}})
+        const data = await Schedule.find({})
+        res.status(200).send(data);
+    } catch (err) {
+        res.status(500).send(err.message)
+    }
 
 })
 
@@ -359,9 +363,13 @@ app.delete('/schedules/:name', fbAuth, [
     const nameToDelete = req.params.name;
     const email = req.user;
 
+    try {
     // Remove from collection
     Schedule.updateOne({email: email}, {$pull: {schedules: {scheduleName: nameToDelete}}}).exec(() => {
         res.send({message: `"${nameToDelete}" has been deleted`})})
+    } catch (err) {
+        res.status(500).send(err.message)
+    }
 })
 
 // User: Save new course list to schedule
@@ -380,10 +388,13 @@ app.post('/schedules/:name', fbAuth, jsonParser, [
         courseIDs.push(e.subject+' '+e.course)
     })
 
-    // Update course information in schedule
-    await Schedule.updateOne({email: email, schedules: {$elemMatch: {scheduleName: sName}}},{$set: {"schedules.$.courseList": courseIDs, "schedules.$.courses": courses, "schedules.$.lastModified": Date(), "schedules.$.numCourses": courses.length}})
-    res.send(checkName)
-    
+    try {
+        // Update course information in schedule
+        await Schedule.updateOne({email: email, schedules: {$elemMatch: {scheduleName: sName}}},{$set: {"schedules.$.courseList": courseIDs, "schedules.$.courses": courses, "schedules.$.lastModified": Date(), "schedules.$.numCourses": courses.length}})
+        res.send(checkName)
+    } catch (err) {
+        res.status(500).send(err.message)
+    }
 })
 
 // User: View details for one schedule
@@ -424,10 +435,14 @@ app.put('/reviews', fbAuth, [
     const rev = req.body.review
     const vis = req.body.visibility
 
-    // Update information in review collection
-    await Review.updateOne({courseID: cID, reviews: {$elemMatch: {review: rev}}},{$set: {"reviews.$.visibility": vis}})
-    const data = await Review.find({courseID: cID})
-    res.status(200).send(data);
+    try {
+        // Update information in review collection
+        await Review.updateOne({courseID: cID, reviews: {$elemMatch: {review: rev}}},{$set: {"reviews.$.visibility": vis}})
+        const data = await Review.find({courseID: cID})
+        res.status(200).send(data);
+    }  catch (err) {
+        res.status(500).send(err.message)
+    }
 })
 
 // Admin: Toggle account status and access
@@ -441,10 +456,14 @@ app.put('/account', fbAuth, [
     const access = req.body.access
     const status = req.body.status
 
-    // Update information in schedule collection
-    await Schedule.updateOne({email: email},{$set: {"access": access, "accountStatus": status}})
-    const data = await Schedule.find({email: email})
-    res.status(200).send(data);
+    try {
+        // Update information in schedule collection
+        await Schedule.updateOne({email: email},{$set: {"access": access, "accountStatus": status}})
+        const data = await Schedule.find({email: email})
+        res.status(200).send(data);
+    }  catch (err) {
+        res.status(500).send(err.message)
+    }
 })
 
 // Admin: View policy   
@@ -479,17 +498,21 @@ app.put('/policy', fbAuth, [
         text: text
     })
 
-    if (filter != 0) {
-        // Update existing entry 
-        await Policy.updateOne({name: policy},{$set: {"text": text}})
-        const all = await Policy.find()
-        res.send(all)
-    }
-    else {
-        // Save new entry and send result
-        await entry.save();
-        const all = await Policy.find()
-        res.send(all)
+    try {
+        if (filter != 0) {
+            // Update existing entry 
+            await Policy.updateOne({name: policy},{$set: {"text": text}})
+            const all = await Policy.find()
+            res.send(all)
+        }
+        else {
+            // Save new entry and send result
+            await entry.save();
+            const all = await Policy.find()
+            res.send(all)
+        }
+    }   catch (err) {
+        res.status(500).send(err.message)
     }
 })
 

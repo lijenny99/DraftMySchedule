@@ -15,16 +15,16 @@ export class SchedulesComponent implements OnInit {
   public info = [];
   public x = [];
   public exist = [];
+  public dataItems = [];
   public show: boolean;
   public showSB: boolean;
   public nameToUpdate;
   public name: string;
 
-  // Form input
+  // Form inputs
   scheduleName = new FormControl('',[
     Validators.required
   ])
-
 
   scheduleForm = new FormGroup({
     schedule: new FormControl('',[
@@ -70,16 +70,18 @@ export class SchedulesComponent implements OnInit {
   editForm =  new FormGroup({
     dataItems: this.fb.array([])
   });
-  public dataItems = [];
 
   constructor(private timetableService: TimetableService, private firebaseService: FirebaseService, private fb: FormBuilder) { }
 
   ngOnInit(): void {
     this.firebaseService.getToken().then(res => {
+      // Check if user is logged in
       if(res) {
         this.timetableService.getPrivateSchedules(res)
         .subscribe(data => {
+          // Extract name of user
           this.name = data[0].user;
+          // Push schedules into array to display
           data[0].schedules.forEach(e=> {
             this.schedules.push({
               sName: e.scheduleName,
@@ -88,6 +90,7 @@ export class SchedulesComponent implements OnInit {
               show: false,
             })
           })
+          // Check if user has admin access
           if(data[0].access === "admin") {
             this.firebaseService.isAdmin = true;
             localStorage.setItem('admin','yes')
@@ -99,14 +102,17 @@ export class SchedulesComponent implements OnInit {
 
   // Create a new schedule
   createSchedule() {
+     // Extract input values
     const sched = this.scheduleForm.controls.schedule.value
     const desc = this.scheduleForm.controls.description.value
     let vis = this.scheduleForm.controls.visibility.value
 
+    // Set blank to false (visibility)
     if (vis == '')
       vis = "false"
 
     this.firebaseService.getToken().then(res => {
+      // Check if user is logged in
       if(res) {
         this.timetableService.createSchedule(res,sched,desc,vis).subscribe(data => {
           if (data) {
@@ -119,15 +125,18 @@ export class SchedulesComponent implements OnInit {
   }
 
   updateSchedule() {
+     // Extract input values
     const sched = this.editForm.controls.dataItems.value[0].schedule
     const desc = this.editForm.controls.dataItems.value[0].description
     let vis = this.editForm.controls.dataItems.value[0].visibility
 
+    // Enforce mandatory field
     if(sched == '') {
       alert('Please enter a schedule name')
     }
     else {
       this.firebaseService.getToken().then(res => {
+        // Check if user is logged in
         if(res) {
           this.timetableService.updateSchedule(res,sched,desc,vis,this.nameToUpdate).subscribe(data => {
             alert('Update successful')
@@ -143,13 +152,14 @@ export class SchedulesComponent implements OnInit {
     this.x = [];
 
     this.firebaseService.getToken().then(res => {
+      // Check if user is logged in
       if(res) {
+        // Add to arrays
         this.timetableService.viewSchedule(res,schedule).subscribe(data => {
           data[0].schedules[0].courses.forEach(e=> {
             this.exist.push(e.courseInfo[0].classNum)
             this.x.push(e)
           });
-    
           this.showSB = true;
         });
       }
@@ -160,6 +170,7 @@ export class SchedulesComponent implements OnInit {
   deleteOne(schedule: string) {
     if(confirm(`Are you sure you want to delete the schedule "${schedule}"?`)) {
       this.firebaseService.getToken().then(res => {
+        // Check if user is logged in
         if(res) {
           this.timetableService.deleteOne(res,schedule).subscribe(data => {
             alert(data.message);
@@ -202,9 +213,11 @@ export class SchedulesComponent implements OnInit {
 
   // Save a list of subject code, course code pairs under a given schedule name
   saveSchedule() {
+    // Extract input values
     const sch = this.scheduleName.value
 
     this.firebaseService.getToken().then(res => {
+      // Check if user is logged in
       if(res) {
         this.timetableService.saveSchedule(res,sch,this.x).subscribe(data => {
           alert(`Schedule ${sch} has been built`)
@@ -221,14 +234,17 @@ export class SchedulesComponent implements OnInit {
     this.nameToUpdate = schedule;
 
     this.firebaseService.getToken().then(res => {
+      // Check if user is logged in
       if(res) {
         this.timetableService.viewSchedule(res,schedule).subscribe(data => {
+          // Set visibility flag
           if (data[0].schedules[0].visibility == "false") {
             vis = false;
           }
           else {
             vis = true;
           }
+          // Set data items to stored values
           this.dataItems = [
             {
               schedule: data[0].schedules[0].scheduleName,
@@ -236,9 +252,11 @@ export class SchedulesComponent implements OnInit {
               visibility: vis,
             }
           ];
+          // Create new form group on editForm
           this.editForm = new FormGroup({
             dataItems: this.fb.array([])
           });
+          // Add controls that assigns dataItems
           this.editForm.setControl(
             "dataItems",
             this.setExistingItems(this.dataItems)
@@ -248,11 +266,12 @@ export class SchedulesComponent implements OnInit {
     })
   }
 
+  // Close edit modal
   close() {
     this.show = false;
   }
 
-
+  // Push values to formArray
   setExistingItems(items): FormArray {
     const formArray = new FormArray([]);
     items.forEach(s => {
@@ -275,6 +294,7 @@ export class SchedulesComponent implements OnInit {
 
     if(confirm(`Are you sure you want to post this review to ${sb} ${cc}?`)) {
       this.firebaseService.getToken().then(res => {
+        // Check if user is logged in
         if(res) {
           this.timetableService.writeReview(res,sb,cc,review).subscribe(data => {
             if (data) {
@@ -288,16 +308,20 @@ export class SchedulesComponent implements OnInit {
   }
 
   updatePassword() {
+     // Extract input values
     let oldPwd = this.updatePasswordForm.controls.current.value
     let newPwd = this.updatePasswordForm.controls.new.value
     let confirmPwd = this.updatePasswordForm.controls.confirm.value
 
+    // Error if password less than 6 characters
     if (newPwd.length < 6) {
       alert("Password must be at least 6 characters long")
     }
+    // Error if passwords don't match
     else if(newPwd != confirmPwd) {
       alert("Confirm password does not match")
     }
+    // Change password
     else {
       this.firebaseService.changePassword(oldPwd,newPwd)
     }
