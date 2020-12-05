@@ -69,6 +69,7 @@ export class SubjectsComponent implements OnInit {
         }
       })
     })
+    console.log(this.reviews)
   }
 
   closeReviews() {

@@ -49,31 +49,6 @@ app.get('/subjects/:subject?/:course?', [
     // Store passed parameters as constants
     const subject = req.params.subject;
     const course = req.params.course;
-    
-    // let r;
-    // const reviewSubject = [];
-
-    // const revs = timetable.filter(e => (
-    //     (e.subject === subject || e.catalog_nbr == subject) && (course ? (e.catalog_nbr.toString().indexOf(course) > -1) : true)
-    // )).map(e => ([{
-    //     su: e.subject,
-    //     ccode: e.catalog_nbr,
-    // }]));
-
-    // revs.forEach(async e => {
-    //     const id = e[0].su + ' ' + e[0].ccode;
-    //     const reviewFilter = await Review.find({courseID: id})
-    //     if (reviewFilter != 0) {
-    //         r = reviewFilter[0].reviews
-    //     }
-    //     else {
-    //         r = null
-    //     }
-    //     reviewSubject.push({
-    //         courseID: id,
-    //         reviews: r,
-    //     })
-    // })
 
     // Filter by specified subject and course if it has a value and map timetable attributes to new array
     const data = timetable.filter(e => (
@@ -92,32 +67,7 @@ app.get('/subjects/:subject?/:course?', [
         fullDescription: e.catalog_description,
         importantInfo: e.course_info[0].descr,
         enrollment: e.course_info[0].enrl_stat
-        // courseID: e.subject+ ' '+ e.catalog_nbr
     }));
-
-    // let merged = [];
-
-    // for(let i=0; i<data.length; i++) {
-    //     merged.push({
-    //      ...data[i], 
-    //      ...(reviewSubject.find((itmInner) => itmInner.id === data[i].id))}
-    //     );
-    //   }
-
-    // console.log(merged)
-    
-
-    // data.forEach(async e => {
-    //     const id = e.subject + ' ' + e.courseCode;
-    //     const reviewFilter = await Review.find({courseID: id})
-    //     if (reviewFilter != 0) {
-    //         r = reviewFilter[0].reviews
-    //     }
-    //     else {
-    //         r = null
-    //     }
-    //     // data.push(r)
-    // })
 
     // Check if subject and course component entry exists in timetable file
     if (data!= 0)// Exists

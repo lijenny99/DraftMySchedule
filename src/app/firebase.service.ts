@@ -36,11 +36,14 @@ export class FirebaseService {
   }
 
   // Sign up
-  async signup(email: string, password : string){
-    await this.afAuth.createUserWithEmailAndPassword(email,password)
-    .then(res=>{
-      console.log(res)
-    }, err => alert(err.message))
+  signup(email: string, password : string){
+    return new Promise<any>((resolve, reject) => {
+      this.afAuth.createUserWithEmailAndPassword(email,password)
+      .then(res=>{
+        resolve(res)
+      }, err => alert(err.message))
+    })
+
   }
 
   // Third party login
@@ -98,6 +101,8 @@ export class FirebaseService {
           }
           
         } else {
+          localStorage.setItem('user',JSON.stringify(user));
+          this.isLoggedIn = true;
           this.signin(email,pwd);
         }
       },err => alert(err))

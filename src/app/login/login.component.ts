@@ -39,17 +39,7 @@ export class LoginComponent implements OnInit {
       alert('Please enter a name')
     }
     else {
-      await this.firebaseService.signup(e,pwd).then(res => {
-        this.timetableService.register(n,e).subscribe();
-
-        var user = firebase.default.auth().currentUser;
-        user.sendEmailVerification().then(e => {
-        alert('Verification email sent')
-        window.location.reload();
-        
-        
-      }).catch(err => alert(err))
-    }).catch(err => alert(err));
+      this.trySignUp(n,e,pwd)
     }
   }
   async signIn(){
@@ -78,9 +68,22 @@ export class LoginComponent implements OnInit {
 
   googleLogin() {
     this.firebaseService.loginWithGoogle().then(res => {
+      this.timetableService.register('Jenny','lijenny1999@gmail.com').subscribe()
       // Redirect to schedule page
       this.router.navigate(['/schedule'])
     })
+  }
+
+  trySignUp(name,email,password) {
+    this.firebaseService.signup(email,password).then(res => {
+    this.timetableService.register(name,email).subscribe();
+
+      var user = firebase.default.auth().currentUser;
+      user.sendEmailVerification().then(e => {
+      alert('Verification email sent')
+      window.location.reload();
+      }).catch(err => alert(err))
+  })
   }
 
 }
