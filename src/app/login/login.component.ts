@@ -48,8 +48,8 @@ export class LoginComponent implements OnInit {
         window.location.reload();
         
         
-      }).catch(err => console.log(err))
-    }).catch(err => console.log(err));
+      }).catch(err => alert(err))
+    }).catch(err => alert(err));
     }
   }
   async signIn(){
