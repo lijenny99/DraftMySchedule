@@ -3,6 +3,8 @@ const express = require('express');
 const app = express();
 const port = 3000;
 
+const path = require('path')
+
 // Set up body-parser
 const bodyParser = require('body-parser')
 const jsonParser = bodyParser.json()
@@ -16,12 +18,12 @@ mongoose.connect('mongodb+srv://jenny:jennifer123@lab5.4agzt.mongodb.net/databas
 mongoose.set('useFindAndModify', false);
 mongoose.connection;
 
-Schedule = require('./app/scheduleModel.js')
-Review = require('./app/reviewModel.js')
-Policy = require('./app/policyModel.js')
+Schedule = require('./src/app/scheduleModel.js')
+Review = require('./src/app/reviewModel.js')
+Policy = require('./src/app/policyModel.js')
 
 // Set up middleware
-const fbAuth = require('./fbAuth')
+const fbAuth = require('./src/fbAuth')
 
 // Set up string similarity
 var stringSimilarity = require('string-similarity');
@@ -29,13 +31,14 @@ var stringSimilarity = require('string-similarity');
 // Read timetable JSON file
 var fs = require('fs');
 var timetable;
-fs.readFile('data.json','utf8',(err,data) => {
+fs.readFile('./src/data.json','utf8',(err,data) => {
     if(err) throw err;
     timetable = JSON.parse(data);
 })
 
 // Set up serving front-end code
-app.use('/',express.static('static'));
+// app.use('/',express.static('static'));
+app.use(express.static(path.join(__dirname,'dist/lab')))
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 // ------------------------------------ PUBLIC ACCESS ------------------------------------ //
@@ -479,4 +482,8 @@ app.use(bodyParser.json());
 // Start a server listing for connections
 app.listen(port,() => {
     console.log(`Listening on port ${port}`);
+})
+
+app.get('*', (req,res) => {
+    res.sendFile(path.join(__dirname,'dist/lab/index.html'))
 })
