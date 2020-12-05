@@ -3,6 +3,7 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { FirebaseService } from '../firebase.service';
 import { TimetableService } from '../timetable.service';
 import {Router} from '@angular/router';
+import * as firebase from 'firebase/app'
 
 @Component({
   selector: 'app-login',
@@ -38,17 +39,16 @@ export class LoginComponent implements OnInit {
       alert('Please enter a name')
     }
     else {
-      await this.firebaseService.signup(e,pwd).then(res => {
-        // Check if user is logged in
-        this.firebaseService.getToken().then(res => {
-          if(res) {
-            // Add user to database
-            this.timetableService.register(res,n,e).subscribe();
-            // Redirect to schedule page
-            this.router.navigate(['/schedule'])
-          }
-        })
-      })
+      this.firebaseService.signup(e,pwd).then((res) => {
+        this.timetableService.register(n,e).subscribe();
+
+        var user = firebase.default.auth().currentUser;
+        user.sendEmailVerification().then(e => {
+        alert('Verification email sent')
+        window.location.reload();
+        
+      }).catch(err => console.log(err))
+    }).catch(err => console.log(err));
     }
   }
   async signIn(){
@@ -66,10 +66,7 @@ export class LoginComponent implements OnInit {
       })
     })
     
-    await this.firebaseService.signin(em,pwd).then(res => {
-      // Redirect to schedule page
-      this.router.navigate(['/schedule'])
-    })
+    await this.firebaseService.verifyLogin(em,pwd)
 
   }
   
@@ -84,4 +81,5 @@ export class LoginComponent implements OnInit {
       this.router.navigate(['/schedule'])
     })
   }
+
 }

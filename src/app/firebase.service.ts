@@ -13,6 +13,7 @@ export class FirebaseService {
   // Global variables
   isAdmin = false;
   isLoggedIn = false;
+  isVerified = false;
   
   // Initialize constructor to check if user is logged in and is admin
   constructor(public afAuth : AngularFireAuth, private router: Router, public timetableService: TimetableService) { 
@@ -30,6 +31,7 @@ export class FirebaseService {
       this.isLoggedIn = true;
       alert('Login successful')
       localStorage.setItem('user',JSON.stringify(res.user))
+      this.router.navigate(['/schedule'])
     }, err => alert(err.message))
   }
 
@@ -37,10 +39,7 @@ export class FirebaseService {
   async signup(email: string, password : string){
     await this.afAuth.createUserWithEmailAndPassword(email,password)
     .then(res=>{
-      // Add to local storage and set global variable to true
-      this.isLoggedIn = true;
-      localStorage.setItem('user',JSON.stringify(res.user))
-      alert('Account created')  
+      console.log(res)
     }, err => alert(err.message))
   }
 
@@ -80,6 +79,27 @@ export class FirebaseService {
           console.log('No user logged in')
         }
       })
+    })
+  }
+
+  verifyLogin(email: string, pwd: string) {
+    return new Promise<any>((resolve,reject) => {
+      firebase.default.auth().signInWithEmailAndPassword(email,pwd).then(res => {
+        const user = res.user;
+        this.isVerified = user.emailVerified;
+        if (!this.isVerified) {
+          if(confirm('Email has not been verified. Click OK to send another email')) {
+            this.afAuth.onAuthStateChanged(e => {
+              e.sendEmailVerification().then(() => {
+                alert("Verification email re-sent")
+                window.location.reload();
+              }).catch(err => alert('Sending email failed'))
+            })
+          }
+        } else {
+          this.signin(email,pwd);
+        }
+      },err => alert(err))
     })
   }
 

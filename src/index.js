@@ -208,7 +208,7 @@ app.get('/publicschedules',async(req,res) => {
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // User: Post user to mongoDB
-app.post('/register', fbAuth, jsonParser, [
+app.post('/register', jsonParser, [
     check("email").trim().escape()
 ], async(req,res) => {
 
@@ -390,7 +390,7 @@ app.post('/schedules/:name', fbAuth, jsonParser, [
     courses.forEach(e => {
         courseIDs.push(e.subject+' '+e.course)
     })
-    
+
     // Filter by a specified schedule name
     const checkName = await Schedule.find({email: email, 'schedules.scheduleName': sName})
 

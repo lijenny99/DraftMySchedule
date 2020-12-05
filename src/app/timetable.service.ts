@@ -30,9 +30,8 @@ export class TimetableService {
   }
 
   // Register new user
-  register(token: string, user: string, email: string): Observable<any>  {
-    const headers = {'Authorization':'Bearer ' + token}
-    return this.http.post<any>('/register',{"user": user, "email": email},{headers}).pipe(
+  register(user: string, email: string): Observable<any>  {
+    return this.http.post<any>('/register',{"user": user, "email": email}).pipe(
       catchError(this.handleError<any>())
     )
   }
