@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import {AngularFireAuth} from '@angular/fire/auth'
 import { Observable, of } from 'rxjs';
 import * as firebase from 'firebase/app'
-import { CanActivate, Router, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
+import { Router } from '@angular/router';
 import { TimetableService } from './timetable.service';
 
 
@@ -12,7 +12,7 @@ import { TimetableService } from './timetable.service';
 export class FirebaseService {
   isAdmin = false;
   isLoggedIn = false;
-  constructor(public firebaseAuth : AngularFireAuth, private router: Router, public timetableService: TimetableService) { 
+  constructor(public afAuth : AngularFireAuth, private router: Router, public timetableService: TimetableService) { 
     if (localStorage.getItem('user'))
       this.isLoggedIn = true
     if (localStorage.getItem('admin'))
@@ -20,7 +20,7 @@ export class FirebaseService {
   }
 
   async signin(email: string, password : string){
-    await this.firebaseAuth.signInWithEmailAndPassword(email,password)
+    await this.afAuth.signInWithEmailAndPassword(email,password)
     .then(res=>{
       this.isLoggedIn = true;
       alert('Login successful')
@@ -29,7 +29,7 @@ export class FirebaseService {
   }
 
   async signup(email: string, password : string){
-    await this.firebaseAuth.createUserWithEmailAndPassword(email,password)
+    await this.afAuth.createUserWithEmailAndPassword(email,password)
     .then(res=>{
       this.isLoggedIn = true;
       localStorage.setItem('user',JSON.stringify(res.user))
@@ -41,14 +41,14 @@ export class FirebaseService {
     const provider = new firebase.default.auth.GoogleAuthProvider();
     provider.addScope('profile');
     provider.addScope('email');
-    await this.firebaseAuth.signInWithPopup(provider).then(res => {
+    await this.afAuth.signInWithPopup(provider).then(res => {
       this.isLoggedIn = true;
       localStorage.setItem('user',JSON.stringify(res.user))
     }, err => alert(err))
   }
 
   signout() {
-    this.firebaseAuth.signOut().then(res => {
+    this.afAuth.signOut().then(res => {
       this.isLoggedIn = false;
       localStorage.removeItem('user')
       localStorage.removeItem('admin')
@@ -60,7 +60,7 @@ export class FirebaseService {
 
   getToken() {
     return new Promise<any>((res,rej) => {
-      this.firebaseAuth.onAuthStateChanged(user => {
+      this.afAuth.onAuthStateChanged(user => {
         if(user) {
           user.getIdToken(true).then(id => {
             res(id);

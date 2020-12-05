@@ -12,9 +12,9 @@ const { check, validationResult } = require('express-validator');
 
 // Set up mongodb
 const mongoose = require('mongoose');
-mongoose.connect('mongodb+srv://jenny:jennifer123@lab5.4agzt.mongodb.net/database?retryWrites=true&w=majority', {useNewUrlParser: true, useUnifiedTopology: true}, (req, res) => { console.log("Mongoose is running") })
+mongoose.connect('mongodb+srv://jenny:jennifer123@lab5.4agzt.mongodb.net/database?retryWrites=true&w=majority', {useNewUrlParser: true, useUnifiedTopology: true}, () => { console.log("Mongoose is running") })
 mongoose.set('useFindAndModify', false);
-const mdb = mongoose.connection
+mongoose.connection;
 
 Schedule = require('./app/scheduleModel.js')
 Review = require('./app/reviewModel.js')
@@ -37,46 +37,11 @@ fs.readFile('data.json','utf8',(err,data) => {
 // Set up serving front-end code
 app.use('/',express.static('static'));
 
-// Keyword search
-app.get('/keyword/:keyword', [
-    check("keyword").trim().escape(),
-    check("keyword").isLength({ min: 5 })
-], (req, res) => {
-    // Store passed parameters as constants
-    const keyword = req.params.keyword;
+/////////////////////////////////////////////////////////////////////////////////////////////
+// ------------------------------------ PUBLIC ACCESS ------------------------------------ //
+/////////////////////////////////////////////////////////////////////////////////////////////
 
-    const errors = validationResult(req)
-    if (!errors.isEmpty()) {
-      return res.status(422).send(`Keyword must be at least 5 characters`)
-    }
-
-    // Filter by specified subject and course if it has a value and map timetable attributes to new array
-    const data = timetable.filter(e => (
-        (e.catalog_nbr.toString().indexOf(keyword) > -1) || (e.className.indexOf(keyword) > -1) || (stringSimilarity.compareTwoStrings(keyword, e.className) > 0.5)
-    )).map(e => ({
-        subject: e.subject,
-        courseCode: e.catalog_nbr,
-        description: e.className,
-        start: e.course_info[0].start_time,
-        end: e.course_info[0].end_time,
-        days: e.course_info[0].days,
-        section: e.course_info[0].class_section,
-        room: e.course_info[0].facility_ID,
-        component: e.course_info[0].ssr_component,
-        classNum: e.course_info[0].class_nbr,
-        fullDescription: e.catalog_description,
-    }));
-
-    // Check if subject and course and (optional) component entry exists in timetable file
-    if (data!= 0)// Exists
-        res.send(data);
-    else {
-        res.status(404).send(`No results found`)
-    }
-        
-})
-
-// Get timetable entry for given subject code and course code
+// Public: Get timetable entry for given subject code and course code
 app.get('/subjects/:subject?/:course?', [
     check("subject").trim().escape(),
     check("course").trim().escape(),
@@ -152,31 +117,59 @@ app.get('/subjects/:subject?/:course?', [
     //     // data.push(r)
     // })
 
-    // Check if subject and course and (optional) component entry exists in timetable file
+    // Check if subject and course component entry exists in timetable file
     if (data!= 0)// Exists
         res.send(data);
-    else if (course == undefined) {// Does not exist 
+    else if (course == undefined) {// Only subject was entered 
         res.status(404).send(`${subject} does not exist`)
     }
-    else {
+    else { // Does not exist
         res.status(404).send(`${subject} ${course} does not exist`)
     }
         
 })
 
-// Post user to mongoDB
-app.post('/register', jsonParser, async(req,res) => {
-    const entry = new Schedule({
-        user: req.body.user,
-        email: req.body.email
-    })
-    try {
-        const newUser = await entry.save();
-        res.send(newUser)
-    } catch (err) {res.status(404).send(err)}
+// Public: Get timetable entry for given keyword
+app.get('/keyword/:keyword', [
+    check("keyword").trim().escape(),
+    check("keyword").isLength({ min: 5 })
+], (req, res) => {
+    // Store passed parameters as constants
+    const keyword = req.params.keyword;
+
+    // Throw error if input is less than 5 characters
+    const errors = validationResult(req)
+    if (!errors.isEmpty()) {
+      return res.status(422).send(`Keyword must be at least 5 characters`)
+    }
+
+    // Filter by specified subject and course if it has a value and map timetable attributes to new array
+    const data = timetable.filter(e => (
+        (e.catalog_nbr.toString().indexOf(keyword) > -1) || (e.className.indexOf(keyword) > -1) || (stringSimilarity.compareTwoStrings(keyword, e.className) > 0.5)
+    )).map(e => ({
+        subject: e.subject,
+        courseCode: e.catalog_nbr,
+        description: e.className,
+        start: e.course_info[0].start_time,
+        end: e.course_info[0].end_time,
+        days: e.course_info[0].days,
+        section: e.course_info[0].class_section,
+        room: e.course_info[0].facility_ID,
+        component: e.course_info[0].ssr_component,
+        classNum: e.course_info[0].class_nbr,
+        fullDescription: e.catalog_description,
+    }));
+
+    // Check if subject and course and (optional) component entry exists in timetable file
+    if (data!= 0)// Exists
+        res.send(data);
+    else {
+        res.status(404).send(`No results found`)
+    }
+        
 })
 
-// Get all reviews
+// Public: Display reviews
 app.get('/reviews', async(req,res) => {
     try {
         const reviews = await Review.find()
@@ -186,17 +179,67 @@ app.get('/reviews', async(req,res) => {
     }
 })
 
+// Public: Display policies 
+app.get('/policy',async(req,res) => {
+    try {
+        const policies = await Policy.find()
+        res.send(policies)
+    } catch (err) {
+        res.status(500).send(err.message)
+    }
+})
+
+// Public: Display all public schedules
+app.get('/publicschedules',async(req,res) => {
+    try {
+        const schedules = await Schedule.find()
+        res.send(schedules)
+    } catch (err) {
+        res.status(500).send(err.message)
+    }
+})
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+// ------------------------------------ AUTHENTICATED USER ACCESS ------------------------------------ //
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// User: Post user to mongoDB
+app.post('/register', fbAuth, jsonParser, [
+    check("email").trim().escape()
+], async(req,res) => {
+
+    // Create a new entry to post
+    const entry = new Schedule({
+        user: req.body.user,
+        email: req.body.email
+    })
+    try {
+        // Save to new collection in mongoDB and send result
+        const newUser = await entry.save();
+        res.send(newUser)
+    } catch (err) {res.status(404).send(err)}
+})
+
 // User: Add review
-app.post('/reviews', fbAuth, jsonParser, async(req,res) => {
+app.post('/reviews', fbAuth, jsonParser, [
+    check("subject").trim().escape(),
+    check("course").trim().escape(),
+    check("review").trim().escape()
+], async(req,res) => {
+    // Store passed parameters as constants
     const user = req.user;
     const subject = req.body.subject;
     const course = req.body.course;
     const cID = subject + " " + course;
     const newReview = req.body.review;
 
+    // Get name of user posting review
     const name = await Schedule.find({email: user})
 
+    // Find course ID in mongoDB
     const filter = await Review.find({courseID: cID})
+
+    // Create a new entry to post 
     const entry = new Review({
         courseID: cID,
         reviews: [
@@ -213,100 +256,24 @@ app.post('/reviews', fbAuth, jsonParser, async(req,res) => {
 
     // Check if subject and course entry exists in timetable file
     if (data!= 0)// Exists
-        if (filter != 0) {
+        if (filter != 0) { // Course ID exists in mongoDB
+            // Push to existing collection
             await Review.updateOne({courseID: cID},{$push: {reviews: {review: newReview, timePosted: new Date(), user: name[0].user}}})
             const all = await Review.find()
             res.send(all)
         }
         else {
-            const newReview = await entry.save();
+            // Save to new collection in mongoDB and send result
+            await entry.save();
             const all = await Review.find()
             res.send(all)
         }
-    else {
+    else { // Does not exist
         res.status(404).send(`${subject} ${course} does not exist`)
     }
 })
 
-// Admin: Toggle review visibility
-app.put('/reviews', fbAuth, jsonParser, async(req,res) => {
- //   const email = req.user
-    const cID = req.body.courseID
-    const rev = req.body.review
-    const vis = req.body.visibility
-
-    await Review.updateOne({courseID: cID, reviews: {$elemMatch: {review: rev}}},{$set: {"reviews.$.visibility": vis}})
-    const data = await Review.find({courseID: cID})
-    res.status(200).send(data);
-})
-
-// Admin: Toggle account status and access
-app.put('/account', fbAuth, jsonParser, async(req,res) => {
-    //   const email = req.user
-       const email = req.body.email
-       const access = req.body.access
-       const status = req.body.status
-   
-       await Schedule.updateOne({email: email},{$set: {"access": access, "accountStatus": status}})
-       const data = await Schedule.find({email: email})
-       res.status(200).send(data);
-   })
-
-// Admin: View policy   
-app.get('/policy/:name', fbAuth, async(req,res) => {
-    const name = req.params.name
-    try {
-        const policies = await Policy.find({name: name})
-        res.send(policies)
-    } catch (err) {
-        res.status(500).send(err.message)
-    }
-})
-
-// Admin: Update policy
-app.put('/policy', jsonParser, async(req,res) => {
-    const policy = req.body.policy;
-    const text = req.body.text;
-
-    const filter = await Policy.find({name: policy})
-    const entry = new Policy({
-        name: policy,
-        text: text
-    })
-
-    if (filter != 0) {
-        await Policy.updateOne({name: policy},{$set: {"text": text}})
-        const all = await Policy.find()
-        res.send(all)
-    }
-    else {
-        const newPolicy = await entry.save();
-        const all = await Policy.find()
-        res.send(all)
-    }
-})
-
-// Public: Display all policies 
-app.get('/policy',async(req,res) => {
-    try {
-        const policies = await Policy.find()
-        res.send(policies)
-    } catch (err) {
-        res.status(500).send(err.message)
-    }
-})
-
-// Public: View public schedules
-app.get('/publicschedules',async(req,res) => {
-    try {
-        const schedules = await Schedule.find()
-        res.send(schedules)
-    } catch (err) {
-        res.status(500).send(err.message)
-    }
-})
-
-
+// User: Get personal schedules
 app.get('/schedules', fbAuth, async(req,res) => {
     const email = req.user
     try {
@@ -317,49 +284,74 @@ app.get('/schedules', fbAuth, async(req,res) => {
     }
 })
 
-app.post('/schedules', fbAuth, jsonParser, async(req,res) => {
+// User: Create new schedule
+app.post('/schedules', fbAuth, jsonParser, [
+    check("scheduleName").trim().escape(),
+    check("visibility").trim().escape(),
+    check("description").trim().escape(),
+    check("scheduleName").isLength({ min: 3 })
+], async(req,res) => {
+    // Store passed parameters as constants
     const email = req.user
     const sName = req.body.scheduleName
     const v = req.body.visibility
     const desc = req.body.description
 
-    const filter = await Schedule.find({email: email})
-    if (filter!=0) {
-        const filterBySchedule = await Schedule.find({email: email, 'schedules.scheduleName': sName})
-        if (filterBySchedule!=0) {
-            res.status(404).send(`A schedule with the name ${sName} already exists!`)
+    // Throw error if input is less than 3 characters
+    const errors = validationResult(req)
+    if (!errors.isEmpty()) {
+        return res.status(422).send(`Schedule name must be at least 3 characters`)
+    }
+
+    // Check if schedule name exists with user
+    const filterBySchedule = await Schedule.find({email: email, 'schedules.scheduleName': sName})
+    if (filterBySchedule!=0) { // Exists
+        res.status(404).send(`A schedule with the name ${sName} already exists!`)
+    }
+    else { // Does not exist
+        // Check if user has reached maximum number of 20 schedules
+        const max = await Schedule.find({email: email})
+        if (`${max[0].schedules.length}` >= 20) { // Max reached
+            res.status(404).send(`You can have reached your maximum of 20 schedules`)
         }
-        else {
-            const max = await Schedule.find({email: email})
-            if (`${max[0].schedules.length}` >= 20) {
-                res.status(404).send(`You can have reached your maximum of 20 schedules`)
+        else { // Add schedule under user
+            await Schedule.updateOne({email: email},{$push: {schedules: {scheduleName: sName, visibility: v, description: desc, lastModified: new Date()}}})
+            const data = await Schedule.find({})
+            res.status(200).send(data);
             }
-            else {
-                await Schedule.updateOne({email: email},{$push: {schedules: {scheduleName: sName, visibility: v, description: desc, lastModified: new Date()}}})
-                const data = await Schedule.find({})
-                res.status(200).send(data);
-             }
-        }
     }
-    else {
-        res.status(404).send(`Permission denied`)
-    }
+
 })
 
-app.put('/schedules/:name', fbAuth, jsonParser, async(req,res) => {
+// User: Edit all aspects of existing schedule
+app.put('/schedules/:name', fbAuth, jsonParser, [
+    check("name").trim().escape(),
+    check("scheduleName").trim().escape(),
+    check("visibility").trim().escape(),
+    check("description").trim().escape(),
+    check("scheduleName").isLength({ min: 3 })
+], async(req,res) => {
+    // Store passed parameters as constants
     const email = req.user
     const oldName = req.params.name
     const newName = req.body.scheduleName
     const newV = req.body.visibility
     const newDesc = req.body.description
 
+    // Throw error if input is less than 3 characters
+    const errors = validationResult(req)
+    if (!errors.isEmpty()) {
+        return res.status(422).send(`Schedule name must be at least 3 characters`)
+    }
+    
+    // Update schedule information
     await Schedule.updateOne({email: email, schedules: {$elemMatch: {scheduleName: oldName}}},{$set: {"schedules.$.scheduleName": newName, "schedules.$.visibility": newV, "schedules.$.lastModified": Date(), "schedules.$.description": newDesc}})
     const data = await Schedule.find({})
     res.status(200).send(data);
 
-
 })
 
+// User: Delete schedule
 app.delete('/schedules/:name', fbAuth, [
     check("nameToDelete").trim().escape(),
 ], async (req,res) => {
@@ -367,43 +359,34 @@ app.delete('/schedules/:name', fbAuth, [
     const nameToDelete = req.params.name;
     const email = req.user;
 
-    // Filter by specified schedule name 
-    const filter = await Schedule.find({email: email, 'schedules.scheduleName': nameToDelete});
-
-    if (filter != 0) { // Exists
-        Schedule.updateOne({email: email}, {$pull: {schedules: {scheduleName: nameToDelete}}}).exec(() => {
-            res.send({message: `"${nameToDelete}" has been deleted`})
-    })}
-    else { // Does not exist
-        res.status(404).send(`There is no schedule with the name ${nameToDelete}`)
-    }
+    // Remove from collection
+    Schedule.updateOne({email: email}, {$pull: {schedules: {scheduleName: nameToDelete}}}).exec(() => {
+        res.send({message: `"${nameToDelete}" has been deleted`})})
 })
 
+// User: Save new course list to schedule
 app.post('/schedules/:name', fbAuth, jsonParser, [
     check("name").trim().escape(),
-    check("courses").trim().escape(),
+    check("courseList").trim().escape(),
 ], async (req,res) => {
     // Store passed parameters as constants
     const sName = req.params.name;
     const courses = req.body.courseList;
     const email = req.user
     let courseIDs = []
+
+    // Track course ID of each course in schedule
     courses.forEach(e => {
         courseIDs.push(e.subject+' '+e.course)
     })
 
-    // Filter by specified schedule name 
-    const checkName = await Schedule.find({email: email, 'schedules.scheduleName': sName});
-
-    if (checkName != 0) { // Schedule exists
-        await Schedule.updateOne({email: email, schedules: {$elemMatch: {scheduleName: sName}}},{$set: {"schedules.$.courseList": courseIDs, "schedules.$.courses": courses, "schedules.$.lastModified": Date(), "schedules.$.numCourses": courses.length}})
-        res.send(checkName)
-    }
-    else { // Schedule does not exist
-        res.status(404).send(`Schedule with name ${sName} was not found!`);
-    }
+    // Update course information in schedule
+    await Schedule.updateOne({email: email, schedules: {$elemMatch: {scheduleName: sName}}},{$set: {"schedules.$.courseList": courseIDs, "schedules.$.courses": courses, "schedules.$.lastModified": Date(), "schedules.$.numCourses": courses.length}})
+    res.send(checkName)
+    
 })
 
+// User: View details for one schedule
 app.get('/schedules/:name', fbAuth, [
     check("name").trim().escape(),
 ], async (req,res) => {
@@ -415,24 +398,99 @@ app.get('/schedules/:name', fbAuth, [
     const filter = await Schedule.find({email: email, 'schedules.scheduleName': sName});;
 
     if (filter != 0) {// Exists
+        // Find schedule information and send
         const data = await Schedule.aggregate([
-            {
-                $match: {email: email}
-            },
-            {
-                $project: {
-                    schedules: {
-                        $filter: {
-                            input: "$schedules", as: "schedule", cond: {$eq: ["$$schedule.scheduleName",sName]}
-                        }
-                    }
-                }
-            }
+            { $match: {email: email}},
+            { $project: { schedules: { $filter: { input: "$schedules", as: "schedule", cond: {$eq: ["$$schedule.scheduleName",sName]}}}}}
         ])
         res.send(data);
     }
     else // Does not exist
         res.status(404).send(`There is no schedule with the name ${sName}`)
+})
+
+////////////////////////////////////////////////////////////////////////////////////////////
+// ------------------------------------ ADMIN ACCESS ------------------------------------ //
+////////////////////////////////////////////////////////////////////////////////////////////
+
+// Admin: Toggle review visibility
+app.put('/reviews', fbAuth, [
+    check("courseID").trim().escape(),
+    check("review").trim().escape(),
+    check("visibility").trim().escape(),
+], jsonParser, async(req,res) => {
+    // Store passed parameters as constants
+    const cID = req.body.courseID
+    const rev = req.body.review
+    const vis = req.body.visibility
+
+    // Update information in review collection
+    await Review.updateOne({courseID: cID, reviews: {$elemMatch: {review: rev}}},{$set: {"reviews.$.visibility": vis}})
+    const data = await Review.find({courseID: cID})
+    res.status(200).send(data);
+})
+
+// Admin: Toggle account status and access
+app.put('/account', fbAuth, [
+    check("email").trim().escape(),
+    check("access").trim().escape(),
+    check("status").trim().escape(),
+], jsonParser, async(req,res) => {
+    // Store passed parameters as constants
+    const email = req.body.email
+    const access = req.body.access
+    const status = req.body.status
+
+    // Update information in schedule collection
+    await Schedule.updateOne({email: email},{$set: {"access": access, "accountStatus": status}})
+    const data = await Schedule.find({email: email})
+    res.status(200).send(data);
+})
+
+// Admin: View policy   
+app.get('/policy/:name', fbAuth, [
+    check("name").trim().escape(),
+], async(req,res) => {
+    // Store passed parameters as constants
+    const name = req.params.name
+    try {
+        const policies = await Policy.find({name: name})
+        res.send(policies)
+    } catch (err) {
+        res.status(500).send(err.message)
+    }
+})
+
+// Admin: Update policy
+app.put('/policy', fbAuth, [
+    check("policy").trim().escape(),
+    check("text").trim().escape(),
+], jsonParser, async(req,res) => {
+    // Store passed parameters as constants
+    const policy = req.body.policy;
+    const text = req.body.text;
+
+    // Find policy in mongoDB
+    const filter = await Policy.find({name: policy})
+
+    // Create a new entry to post
+    const entry = new Policy({
+        name: policy,
+        text: text
+    })
+
+    if (filter != 0) {
+        // Update existing entry 
+        await Policy.updateOne({name: policy},{$set: {"text": text}})
+        const all = await Policy.find()
+        res.send(all)
+    }
+    else {
+        // Save new entry and send result
+        await entry.save();
+        const all = await Policy.find()
+        res.send(all)
+    }
 })
 
 // Parse data in body as JSON
