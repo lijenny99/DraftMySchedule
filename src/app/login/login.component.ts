@@ -39,13 +39,14 @@ export class LoginComponent implements OnInit {
       alert('Please enter a name')
     }
     else {
-      this.firebaseService.signup(e,pwd).then((res) => {
+      await this.firebaseService.signup(e,pwd).then(res => {
         this.timetableService.register(n,e).subscribe();
 
         var user = firebase.default.auth().currentUser;
         user.sendEmailVerification().then(e => {
         alert('Verification email sent')
         window.location.reload();
+        
         
       }).catch(err => console.log(err))
     }).catch(err => console.log(err));

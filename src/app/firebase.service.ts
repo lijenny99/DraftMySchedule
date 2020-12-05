@@ -31,7 +31,6 @@ export class FirebaseService {
       this.isLoggedIn = true;
       alert('Login successful')
       localStorage.setItem('user',JSON.stringify(res.user))
-      this.router.navigate(['/schedule'])
     }, err => alert(err.message))
   }
 
@@ -96,10 +95,11 @@ export class FirebaseService {
               }).catch(err => alert('Sending email failed'))
             })
           }
+          
         } else {
           this.signin(email,pwd);
         }
-      },err => alert(err))
+      },err => reject(err))
     })
   }
 

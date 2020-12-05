@@ -15,9 +15,18 @@
     </div>
   </form>
   <ul>
+    <div class="reviews" *ngIf="showReview">
+      <button class="close" (click)="closeReviews()">X</button>
+      <li *ngFor="let r of reviews">
+        <span class="bold">User: {{r.user}} <span class="italic">(Posted: {{r.timePosted}})</span></span>
+        <br>
+        Review: {{r.review}}
+      </li>
+    </div>
     <li *ngFor="let subject of timetableInfo">
       <span class="bold">{{subject.subject}} {{subject.courseCode}} - {{subject.description}}</span>
       <button class="details" (click)="viewDetails(subject)">Details</button>
+      <button class="details" (click)="viewReviews(subject.subject,subject.courseCode)">Reviews</button>
       <br>
       {{subject.component}} {{subject.section}}: {{subject.days}}
       {{subject.start}}-{{subject.end}} {{subject.room}}

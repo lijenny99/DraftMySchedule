@@ -10,6 +10,8 @@ import { TimetableService } from '../timetable.service';
 export class SubjectsComponent implements OnInit {
   // Global variables
   public timetableInfo = [];
+  public reviews = []
+  showReview = false;
 
   // Form input
   subjectsForm = new FormGroup({
@@ -29,8 +31,11 @@ export class SubjectsComponent implements OnInit {
     const s = this.subjectsForm.controls.subject.value.toUpperCase()
     const cs = this.subjectsForm.controls.course.value.toUpperCase()
     const key = this.subjectsForm.controls.keyword.value.toUpperCase()
-    
-    if (s) { // Search by subject and optional course code component
+
+    if (s == '' && cs == '' && key == '') {
+      alert('Please enter values')
+    } 
+    else if (s) { // Search by subject and optional course code component
       this.timetableService.getTimetableInfo(s, cs).subscribe(data => this.timetableInfo = data)
     }
     else if (cs && !s) { // Search by course code only
@@ -45,4 +50,29 @@ export class SubjectsComponent implements OnInit {
   viewDetails(subject) {
     subject.show = !subject.show;
   }
+
+  viewReviews(subject,course) {
+    this.reviews = [];
+    this.showReview = true;
+    const cID = subject+' '+course;
+    this.timetableService.getReviews().subscribe(data => {
+      data.forEach(e => {
+        if (e.courseID == cID) {
+          e.reviews.forEach(r => {
+            if(r.visibility == "public")
+              this.reviews.push({
+                user: r.user,
+                timePosted: r.timePosted,
+                review: r.review
+              })
+          })
+        }
+      })
+    })
+  }
+
+  closeReviews() {
+    this.showReview = false;
+  }
+
 }
